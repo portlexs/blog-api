@@ -10,6 +10,11 @@ class UserRead(BaseModel):
     id: uuid.UUID
     email: EmailStr
 
+    def model_dump(self, **kwargs):
+        data = super().model_dump(**kwargs)
+        data["id"] = str(data["id"])
+        return data
+
 
 class UserCreate(BaseModel):
     email: EmailStr
