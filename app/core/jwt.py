@@ -8,11 +8,11 @@ from config import settings
 
 
 class TokenType(Enum):
-    access = timedelta(minutes=15)
-    refresh = timedelta(days=7)
+    ACCESS = timedelta(minutes=15)
+    REFRESH = timedelta(days=7)
 
 
-def create_token(data: Dict[str, Any], token_type: TokenType) -> str:
+def create_token(token_type: TokenType, data: Dict[str, Any]) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + token_type.value
     to_encode.update({"exp": expire})
