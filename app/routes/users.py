@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -5,14 +7,14 @@ from core.jwt import TokenType, create_token
 from core.security import verify_password
 from db.dependencies import get_db
 from services.user import create_user, get_user_by_email, get_user_by_id
-from schemas.user import UserCreate
+from schemas.user import UserCreate, UserLogin, UserLoginResponse
 
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/{user_id}")
-async def get_user(user_id: str, db: Session = Depends(get_db)):
+async def get_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
     """Get user in blog by id"""
     return get_user_by_id(db, user_id)
 
@@ -28,14 +30,16 @@ async def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-async def login_user(user_in: UserCreate, db: Session = Depends(get_db)):
+async def login_user(
+    user_in: UserLogin, db: Session = Depends(get_db)
+) -> UserLoginResponse:
     """Login user in blog"""
     user = get_user_by_email(db, user_in.email)
     if not user or not verify_password(user_in.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    token = create_token(TokenType.ACCESS, {"id": user.id, "email": user.email})
-    return {"access_token": token, "token_type": "bearer"}
+    token = create_token(TokenType.ACCESS, {"id": str(user.id), "email": user.email})
+    return UserLoginResponse(access_token=token)
 
 
 @router.put("/{user_id}")

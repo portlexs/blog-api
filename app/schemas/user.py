@@ -29,3 +29,8 @@ class UserUpdate(BaseModel):
 
     email: Optional[EmailStr] = None
     password: Optional[str] = None
+
+
+class UserLoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
