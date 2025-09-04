@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr
@@ -6,7 +7,7 @@ from pydantic import BaseModel, EmailStr
 class UserRead(BaseModel):
     """User read schema"""
 
-    id: int
+    id: uuid.UUID
     email: EmailStr
 
 
