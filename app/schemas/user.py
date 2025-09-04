@@ -3,21 +3,24 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 
 
-class UserBase(BaseModel):
-    """User base schema"""
-
-    email: EmailStr
-
-
-class UserRead(UserBase):
+class UserRead(BaseModel):
     """User read schema"""
 
     id: int
+    email: EmailStr
 
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
     """User create schema"""
 
+    email: EmailStr
+    password: str
+
+
+class UserLogin(BaseModel):
+    """User login schema"""
+
+    email: EmailStr
     password: str
 
 
