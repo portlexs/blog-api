@@ -3,6 +3,7 @@ import uuid
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
+from core.security import hash_password
 from models.user import User
 from schemas.user import UserCreate
 
@@ -16,8 +17,13 @@ def get_user_by_email(db: Session, user_email: EmailStr) -> User:
 
 
 def create_user(db: Session, user_in: UserCreate) -> User:
-    user = User(**user_in)
+    user_data = user_in.model_dump()
+    user_data["password"] = hash_password(user_data["password"])
+
+    user = User(**user_data)
+
     db.add(user)
     db.commit()
     db.refresh(user)
+
     return user
