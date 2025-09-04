@@ -1,9 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-router = APIRouter(
-    prefix="/users",
-    tags=["users"],
-)
+from db.dependencies import get_db
+from models.user import User
+from services.user import get_user, create_user
+from schemas.user import UserCreate
+
+
+router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/{user_id}")
@@ -13,9 +17,13 @@ async def get_user(user_id: int) -> dict:
 
 
 @router.post("/")
-async def register_user() -> dict:
+async def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     """Register user in blog"""
-    return {"message": "register_user()"}
+    if get_user(db, user_in.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    user = create_user(db, user_in)
+    return user
 
 
 @router.post("/login")
