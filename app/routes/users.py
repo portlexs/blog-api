@@ -6,6 +6,12 @@ router = APIRouter(
 )
 
 
+@router.get("/{user_id}")
+async def get_user(user_id: int) -> dict:
+    """Get user in blog by id"""
+    return {"message": f"get_user({user_id})"}
+
+
 @router.post("/")
 async def register_user() -> dict:
     """Register user in blog"""
@@ -16,12 +22,6 @@ async def register_user() -> dict:
 async def login_user() -> dict:
     """Login user in blog"""
     return {"message": "login_user()"}
-
-
-@router.get("/{user_id}")
-async def get_user(user_id: int) -> dict:
-    """Get user in blog by id"""
-    return {"message": f"get_user({user_id})"}
 
 
 @router.put("/{user_id}")
