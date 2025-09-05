@@ -56,7 +56,7 @@ async def update_user(
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if user_in.email and user_in.email != db_user.email:
+    if user_in.email:
         if users_service.get_user_by_email(db, user_in.email):
             raise HTTPException(status_code=400, detail="Email already registered")
 
