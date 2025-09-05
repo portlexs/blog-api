@@ -6,8 +6,13 @@ from sqlalchemy.orm import Session
 from core.jwt import TokenType, create_token
 from core.security import verify_password
 from db.dependencies import get_db
-from services.user import create_user, get_user_by_email, get_user_by_id
-from schemas.user import UserCreate, UserLogin, UserLoginResponse, UserRead
+from services.user import (
+    create_user,
+    get_user_by_email,
+    get_user_by_id,
+    update_user_service,
+)
+from schemas.user import UserCreate, UserLogin, UserLoginResponse, UserRead, UserUpdate
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -48,6 +53,18 @@ async def login_user(
 
 
 @router.put("/{user_id}")
-async def update_user(user_id: int) -> dict:
+async def update_user(
+    user_id: uuid.UUID, user_in: UserUpdate, db: Session = Depends(get_db)
+) -> UserRead:
     """Update user in blog by id"""
-    return {"message": f"update_user({user_id})"}
+    db_user = get_user_by_id(db, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user_in.email and user_in.email != db_user.email:
+        if get_user_by_email(db, user_in.email):
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    updated_user = update_user_service(db, user_id, user_in)
+
+    return UserRead.model_validate(updated_user)
