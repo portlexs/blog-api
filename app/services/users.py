@@ -4,8 +4,8 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from core.security import hash_password
-from models.user import User
-from schemas.user import UserCreate, UserUpdate
+from models.users import User
+from schemas.users import UserCreate, UserUpdate
 
 
 def get_user_by_id(db: Session, user_id: uuid.UUID) -> User | None:
