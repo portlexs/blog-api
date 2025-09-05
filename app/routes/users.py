@@ -3,15 +3,10 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+import services.user as users_service
 from core.jwt import TokenType, create_token
 from core.security import verify_password
 from db.dependencies import get_db
-from services.user import (
-    create_user,
-    get_user_by_email,
-    get_user_by_id,
-    update_user_service,
-)
 from schemas.user import UserCreate, UserLogin, UserLoginResponse, UserRead, UserUpdate
 
 
@@ -21,7 +16,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("/{user_id}")
 async def get_user(user_id: uuid.UUID, db: Session = Depends(get_db)) -> UserRead:
     """Get user in blog by id"""
-    user = get_user_by_id(db, user_id)
+    user = users_service.get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -31,10 +26,10 @@ async def get_user(user_id: uuid.UUID, db: Session = Depends(get_db)) -> UserRea
 @router.post("/")
 async def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
     """Register user in blog"""
-    if get_user_by_email(db, user_in.email):
+    if users_service.get_user_by_email(db, user_in.email):
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    user = create_user(db, user_in)
+    user = users_service.create_user(db, user_in)
     return UserRead.model_validate(user)
 
 
@@ -43,7 +38,7 @@ async def login_user(
     user_in: UserLogin, db: Session = Depends(get_db)
 ) -> UserLoginResponse:
     """Login user in blog"""
-    user = get_user_by_email(db, user_in.email)
+    user = users_service.get_user_by_email(db, user_in.email)
     if not user or not verify_password(user_in.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
@@ -57,14 +52,13 @@ async def update_user(
     user_id: uuid.UUID, user_in: UserUpdate, db: Session = Depends(get_db)
 ) -> UserRead:
     """Update user in blog by id"""
-    db_user = get_user_by_id(db, user_id)
+    db_user = users_service.get_user_by_id(db, user_id)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
     if user_in.email and user_in.email != db_user.email:
-        if get_user_by_email(db, user_in.email):
+        if users_service.get_user_by_email(db, user_in.email):
             raise HTTPException(status_code=400, detail="Email already registered")
 
-    updated_user = update_user_service(db, user_id, user_in)
-
+    updated_user = users_service.update_user(db, user_id, user_in)
     return UserRead.model_validate(updated_user)

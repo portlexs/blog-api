@@ -29,7 +29,7 @@ def create_user(db: Session, user_in: UserCreate) -> User:
     return user
 
 
-def update_user_service(db: Session, user_id: uuid.UUID, user_in: UserUpdate) -> User:
+def update_user(db: Session, user_id: uuid.UUID, user_in: UserUpdate) -> User:
     db_user = get_user_by_id(db, user_id)
     user_data = user_in.model_dump(exclude_unset=True)
 
