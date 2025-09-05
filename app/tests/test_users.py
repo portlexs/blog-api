@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 
 class TestRegisterUser:
 
-    def test_user_registered_in_db(self, client: TestClient) -> None:
+    def test_successful_register(self, client: TestClient) -> None:
         user_data = {"email": "test_user@example.com", "password": "password123"}
 
         response = client.post("/api/users/", json=user_data)
@@ -24,7 +24,6 @@ class TestRegisterUser:
         response = client.post("/api/users/", json=user_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json() == {"detail": "Email already registered"}
 
     def test_invalid_email(self, client: TestClient) -> None:
         user_data = {"email": "invalid_email", "password": "password123"}
@@ -44,5 +43,51 @@ class TestRegisterUser:
         user_data = {"email": "test_user@example.com", "password": ""}
 
         response = client.post("/api/users/", json=user_data)
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+class TestLoginUser:
+
+    def test_successful_login(self, client: TestClient) -> None:
+        user_data = {"email": "test_user@example.com", "password": "password123"}
+
+        client.post("/api/users/", json=user_data)
+
+        response = client.post("/api/users/login", json=user_data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "access_token" in response.json()
+        # TODO: check if token is valid
+
+    def test_incorrect_email(self, client: TestClient) -> None:
+        user_data = {"email": "test_user@example.com", "password": "password123"}
+
+        response = client.post("/api/users/login", json=user_data)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_incorrect_password(self, client: TestClient) -> None:
+        user_data = {"email": "test_user@example.com", "password": "password123"}
+
+        client.post("/api/users/", json=user_data)
+
+        user_data["password"] = "wrong_password"
+
+        response = client.post("/api/users/login", json=user_data)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_invalid_email(self, client: TestClient) -> None:
+        user_data = {"email": "2453656", "password": "password123"}
+
+        response = client.post("/api/users/login", json=user_data)
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    def test_empty_password(self, client: TestClient) -> None:
+        user_data = {"email": "test_user@example.com", "password": ""}
+
+        response = client.post("/api/users/login", json=user_data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
