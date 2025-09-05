@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     api: APISettings
     db: DBSettings
     jwt: JWTSettings
+    test_db: DBSettings
 
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),
