@@ -12,6 +12,7 @@ from config import settings
 from db.session import Base
 from db.dependencies import get_db
 from main import app
+from models.users import User
 
 
 @pytest.fixture(scope="session")
@@ -30,12 +31,19 @@ def create_test_database(test_engine):
 
 @pytest.fixture
 def db_session(test_engine, create_test_database):
+    connection = test_engine.connect()
+    transaction = connection.begin()
+
     TestingSessionLocal = sessionmaker(
-        autocommit=False, autoflush=False, bind=test_engine
+        autocommit=False, autoflush=False, bind=connection
     )
     session = TestingSessionLocal()
+
     yield session
+
     session.close()
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture
