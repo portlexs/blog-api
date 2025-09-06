@@ -1,7 +1,8 @@
 import uuid
+from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import AnyUrl, BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserInfoResponse(BaseModel):
@@ -9,6 +10,11 @@ class UserInfoResponse(BaseModel):
 
     id: uuid.UUID
     email: EmailStr
+    username: str = Field(..., min_length=3, max_length=50)
+    bio: Optional[str] = Field(None, max_length=255)
+    image_url: Optional[AnyUrl] = None
+    created_at: datetime
+    is_banned: bool
 
     def model_dump(self, **kwargs):
         data = super().model_dump(**kwargs)
@@ -18,7 +24,10 @@ class UserInfoResponse(BaseModel):
 
 class UserCreateRequest(BaseModel):
     email: EmailStr
+    username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=6)
+    bio: Optional[str] = Field(None, max_length=255)
+    image_url: Optional[AnyUrl] = Field(None, max_length=2048)
 
 
 class UserLoginRequest(BaseModel):
@@ -28,7 +37,10 @@ class UserLoginRequest(BaseModel):
 
 class UserUpdateRequest(BaseModel):
     email: Optional[EmailStr] = None
+    username: Optional[str] = Field(None, min_length=3, max_length=50)
     password: Optional[str] = Field(None, min_length=6)
+    bio: Optional[str] = Field(None, max_length=255)
+    image_url: Optional[str] = Field(None, max_length=2048)
 
 
 class UserLoginResponse(BaseModel):
