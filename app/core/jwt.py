@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
-from jose import jwt
+from jose import jwt, JWTError
 
 from config import settings
 
@@ -20,8 +20,10 @@ def create_token(token_type: TokenType, data: Dict[str, Any]) -> str:
     return jwt.encode(to_encode, settings.jwt.secret_key, settings.jwt.algorithm)
 
 
-def decode_token(token: str) -> Dict[str, Any]:
-    payload = jwt.decode(
-        token, settings.jwt.secret_key, algorithms=[settings.jwt.algorithm]
-    )
-    return payload
+def decode_token(token: str) -> Optional[Dict[str, Any]]:
+    try:
+        return jwt.decode(
+            token, settings.jwt.secret_key, algorithms=[settings.jwt.algorithm]
+        )
+    except JWTError:
+        return None
