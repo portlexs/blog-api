@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 import services.users as users_service
+from core import jwt
 from core.auth_dependencies import CurrentUser
-from core.jwt import TokenType, create_token
 from core.security import verify_password
 from db.dependencies import get_db
 from schemas.users import (
@@ -46,8 +46,11 @@ async def login_user(
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     user_data = UserInfoResponse.model_validate(user)
-    token = create_token(TokenType.ACCESS, user_data.model_dump())
-    return UserLoginResponse(access_token=token)
+
+    access_token = jwt.create_token("access", user_data.model_dump())
+    refresh_token = jwt.create_token("refresh", {"id": str(user_data.id)})
+
+    return UserLoginResponse(access_token=access_token, refresh_token=refresh_token)
 
 
 @router.put("/me")
@@ -62,3 +65,24 @@ async def update_user(
 
     updated_user = users_service.update_user(db, current_user.id, user_in)
     return UserInfoResponse.model_validate(updated_user)
+
+
+@router.post("/refresh")
+async def refresh_token(
+    refresh_token: str, db: Session = Depends(get_db)
+) -> UserLoginResponse:
+    """Refresh token in blog"""
+    payload = jwt.decode_token(refresh_token)
+    if not payload or payload.get("type") != "refresh" or payload.get("id") is None:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    user = users_service.get_user_by_id(db, payload["id"])
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+
+    user_data = UserInfoResponse.model_validate(user)
+
+    access_token = jwt.create_token("access", user_data.model_dump())
+    refresh_token = jwt.create_token("refresh", {"id": str(user_data.id)})
+
+    return UserLoginResponse(access_token=access_token, refresh_token=refresh_token)
