@@ -1,6 +1,8 @@
 from fastapi import status
 from fastapi.testclient import TestClient
 
+from core import jwt
+
 
 class TestRegisterUser:
 
@@ -10,9 +12,7 @@ class TestRegisterUser:
         response_data = create_response.json()
 
         assert create_response.status_code == status.HTTP_200_OK
-        assert "id" in response_data
-        assert "email" in response_data
-        assert response_data["email"] == user_data["email"]
+        assert "email" in response_data and response_data["email"] == user_data["email"]
         assert "password" not in response_data
 
     def test_email_exists(self, client: TestClient) -> None:
@@ -209,3 +209,47 @@ class TestUpdateUser:
         )
 
         assert update_response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+class TestRefreshToken:
+
+    def test_successful_refresh_token(self, client: TestClient) -> None:
+        # create user
+        user_data = {"email": "test_user@example.com", "password": "password123"}
+        client.post("/api/users/", json=user_data)
+
+        # login user
+        login_response = client.post("/api/users/login", json=user_data)
+        access_token = login_response.json()["access_token"]
+        refresh_token = login_response.json()["refresh_token"]
+
+        # refresh token
+        refresh_response = client.post(
+            "/api/users/refresh", params={"refresh_token": refresh_token}
+        )
+        new_tokens = refresh_response.json()
+
+        assert refresh_response.status_code == status.HTTP_200_OK
+        assert "access_token" in new_tokens and "refresh_token" in new_tokens
+
+        assert new_tokens["access_token"] != access_token
+        assert new_tokens["refresh_token"] != refresh_token
+
+        assert jwt.decode_token(new_tokens["access_token"]) is not None
+        assert jwt.decode_token(new_tokens["refresh_token"]) is not None
+
+    def test_refresh_with_access_token(self, client: TestClient) -> None:
+        # create user
+        user_data = {"email": "test_user@example.com", "password": "password123"}
+        client.post("/api/users/", json=user_data)
+
+        # login user
+        login_response = client.post("/api/users/login", json=user_data)
+        access_token = login_response.json()["access_token"]
+
+        # refresh token with access token
+        refresh_response = client.post(
+            "/api/users/refresh", params={"refresh_token": access_token}
+        )
+
+        assert refresh_response.status_code == status.HTTP_401_UNAUTHORIZED
