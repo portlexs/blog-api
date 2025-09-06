@@ -1,5 +1,3 @@
-import uuid
-
 from fastapi import status
 from fastapi.testclient import TestClient
 
@@ -102,40 +100,47 @@ class TestLoginUser:
 class TestGetUser:
 
     def test_successful_create_and_get_user(self, client: TestClient) -> None:
-        # create user and get his id
+        # create user
         user_data = {"email": "test_user@example.com", "password": "password123"}
-        create_response = client.post("/api/users/", json=user_data)
-        user_id = create_response.json()["id"]
+        client.post("/api/users/", json=user_data)
 
-        # get user by id
-        get_response = client.get(f"/api/users/{user_id}")
+        # login user
+        login_response = client.post("/api/users/login", json=user_data)
+        access_token = login_response.json()["access_token"]
+
+        # get user
+        get_response = client.get(
+            f"/api/users/me", headers={"Authorization": f"Bearer {access_token}"}
+        )
 
         assert get_response.status_code == status.HTTP_200_OK
         assert get_response.json()["email"] == user_data["email"]
         assert "password" not in get_response.json()
 
-    def test_user_not_found(self, client: TestClient) -> None:
-        get_response = client.get(f"/api/users/{uuid.uuid4()}")
+    def test_user_unauthorized(self, client: TestClient) -> None:
+        get_response = client.get("/api/users/me")
 
-        assert get_response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_invalid_uuid(self, client: TestClient) -> None:
-        get_response = client.get("/api/users/1234")
-
-        assert get_response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert get_response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 class TestUpdateUser:
 
     def test_successful_update_user_email(self, client: TestClient) -> None:
-        # create user and get his id
+        # create user
         user_data = {"email": "test_user@example.com", "password": "password123"}
-        create_response = client.post("/api/users/", json=user_data)
-        user_id = create_response.json()["id"]
+        client.post("/api/users/", json=user_data)
+
+        # login user
+        login_response = client.post("/api/users/login", json=user_data)
+        access_token = login_response.json()["access_token"]
 
         # update user email
         user_data_to_update = {"email": "new_test_user@example.com"}
-        update_response = client.put(f"/api/users/{user_id}", json=user_data_to_update)
+        update_response = client.put(
+            f"/api/users/me",
+            headers={"Authorization": f"Bearer {access_token}"},
+            json=user_data_to_update,
+        )
 
         assert update_response.status_code == status.HTTP_200_OK
 
@@ -147,16 +152,24 @@ class TestUpdateUser:
         login_response = client.post("/api/users/login", json=new_user_data)
 
         assert login_response.status_code == status.HTTP_200_OK
+        assert "access_token" in login_response.json()
 
     def test_successful_update_user_password(self, client: TestClient) -> None:
-        # create user and get his id
+        # create user
         user_data = {"email": "test_user@example.com", "password": "password123"}
-        create_user_response = client.post("/api/users/", json=user_data)
-        user_id = create_user_response.json()["id"]
+        client.post("/api/users/", json=user_data)
+
+        # login user
+        login_response = client.post("/api/users/login", json=user_data)
+        access_token = login_response.json()["access_token"]
 
         # update user password
         user_data_to_update = {"password": "new_password123"}
-        update_response = client.put(f"/api/users/{user_id}", json=user_data_to_update)
+        update_response = client.put(
+            f"/api/users/me",
+            headers={"Authorization": f"Bearer {access_token}"},
+            json=user_data_to_update,
+        )
 
         assert update_response.status_code == status.HTTP_200_OK
         assert "password" not in update_response.json()
@@ -171,44 +184,28 @@ class TestUpdateUser:
         assert login_response.status_code == status.HTTP_200_OK
         assert "access_token" in login_response.json()
 
-    def test_successful_update_user_email_and_password(
-        self, client: TestClient
-    ) -> None:
-        # create user and get his id
-        user_data = {"email": "test_user@example.com", "password": "password123"}
-        create_response = client.post("/api/users/", json=user_data)
-        user_id = create_response.json()["id"]
-
-        # update user email and password
-        user_data_to_update = {
-            "email": "new_test_user@example.com",
-            "password": "new_password123",
-        }
-        update_response = client.put(f"/api/users/{user_id}", json=user_data_to_update)
-
-        assert update_response.status_code == status.HTTP_200_OK
-        assert "password" not in update_response.json()
-
-        # login user with new email and password
-        login_response = client.post("/api/users/login", json=user_data_to_update)
-
-        assert login_response.status_code == status.HTTP_200_OK
-
-    def test_updating_user_not_found(self, client: TestClient) -> None:
+    def test_updating_user_unauthorized(self, client: TestClient) -> None:
         user_data = {"email": "test_user@example.com", "password": "password123"}
 
-        update_response = client.put(f"/api/users/{uuid.uuid4()}", json=user_data)
+        update_response = client.put(f"/api/users/me", json=user_data)
 
-        assert update_response.status_code == status.HTTP_404_NOT_FOUND
+        assert update_response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_updating_email_already_exists(self, client: TestClient) -> None:
-        # create user and get his id
+        # create user
         user_data = {"email": "test_user@example.com", "password": "password123"}
-        create_response = client.post("/api/users/", json=user_data)
-        user_id = create_response.json()["id"]
+        client.post("/api/users/", json=user_data)
+
+        # login user
+        login_response = client.post("/api/users/login", json=user_data)
+        access_token = login_response.json()["access_token"]
 
         # try to update user email
         user_data_to_update = {"email": "test_user@example.com"}
-        update_response = client.put(f"/api/users/{user_id}", json=user_data_to_update)
+        update_response = client.put(
+            f"/api/users/me",
+            headers={"Authorization": f"Bearer {access_token}"},
+            json=user_data_to_update,
+        )
 
         assert update_response.status_code == status.HTTP_400_BAD_REQUEST
