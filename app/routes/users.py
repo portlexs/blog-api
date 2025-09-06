@@ -8,9 +8,9 @@ from core.security import verify_password
 from db.dependencies import get_db
 from schemas.users import (
     UserCreateRequest,
+    UserInfoResponse,
     UserLoginRequest,
     UserLoginResponse,
-    UserInfo,
     UserUpdateRequest,
 )
 
@@ -19,21 +19,21 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me")
-async def get_current_user(current_user: CurrentUser) -> UserInfo:
+async def get_current_user(current_user: CurrentUser) -> UserInfoResponse:
     """Get current user in blog"""
-    return UserInfo.model_validate(current_user)
+    return UserInfoResponse.model_validate(current_user)
 
 
 @router.post("/")
 async def register_user(
     user_in: UserCreateRequest, db: Session = Depends(get_db)
-) -> UserInfo:
+) -> UserInfoResponse:
     """Register user in blog"""
     if users_service.get_user_by_email(db, user_in.email):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     user = users_service.create_user(db, user_in)
-    return UserInfo.model_validate(user)
+    return UserInfoResponse.model_validate(user)
 
 
 @router.post("/login")
@@ -45,7 +45,7 @@ async def login_user(
     if not user or not verify_password(user_in.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    user_data = UserInfo.model_validate(user)
+    user_data = UserInfoResponse.model_validate(user)
     token = create_token(TokenType.ACCESS, user_data.model_dump())
     return UserLoginResponse(access_token=token)
 
@@ -55,10 +55,10 @@ async def update_user(
     user_in: UserUpdateRequest,
     current_user: CurrentUser,
     db: Session = Depends(get_db),
-) -> UserInfo:
+) -> UserInfoResponse:
     """Update user in blog by id"""
     if user_in.email and users_service.get_user_by_email(db, user_in.email):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     updated_user = users_service.update_user(db, current_user.id, user_in)
-    return UserInfo.model_validate(updated_user)
+    return UserInfoResponse.model_validate(updated_user)
