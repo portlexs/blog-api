@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import settings
 from db.session import Base
 from db.dependencies import get_db
+from helpers.user_helper import UserHelper
 from main import app
 from models.users import User
 
@@ -58,3 +59,8 @@ def client(db_session):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def user_helper(client):
+    return UserHelper(client)
