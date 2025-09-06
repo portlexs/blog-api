@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
-class UserRead(BaseModel):
+class UserInfo(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -16,21 +16,20 @@ class UserRead(BaseModel):
         return data
 
 
-class UserCreate(BaseModel):
+class UserCreateRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6)
 
 
-class UserLogin(BaseModel):
+class UserLoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6)
 
 
-class UserUpdate(BaseModel):
+class UserUpdateRequest(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = Field(None, min_length=6)
 
 
 class UserLoginResponse(BaseModel):
     access_token: str
-    token_type: str = "bearer"

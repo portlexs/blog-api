@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from core.security import hash_password
 from models.users import User
-from schemas.users import UserCreate, UserUpdate
+from schemas.users import UserCreateRequest, UserUpdateRequest
 
 
 def get_user_by_id(db: Session, user_id: uuid.UUID) -> User | None:
@@ -16,7 +16,7 @@ def get_user_by_email(db: Session, user_email: EmailStr) -> User | None:
     return db.query(User).filter(User.email == user_email).first()
 
 
-def create_user(db: Session, user_in: UserCreate) -> User:
+def create_user(db: Session, user_in: UserCreateRequest) -> User:
     user_data = user_in.model_dump()
     user_data["password"] = hash_password(user_data["password"])
 
@@ -29,7 +29,7 @@ def create_user(db: Session, user_in: UserCreate) -> User:
     return user
 
 
-def update_user(db: Session, user_id: uuid.UUID, user_in: UserUpdate) -> User:
+def update_user(db: Session, user_id: uuid.UUID, user_in: UserUpdateRequest) -> User:
     db_user = get_user_by_id(db, user_id)
     user_data = user_in.model_dump(exclude_unset=True)
 
