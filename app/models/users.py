@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 
-from sqlalchemy import String
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -15,3 +16,8 @@ class User(Base):
     )
     email: Mapped[str] = mapped_column(String(254), unique=True)
     password: Mapped[str] = mapped_column(String(128))
+    username: Mapped[str] = mapped_column(String(50), unique=True)
+    bio: Mapped[str] = mapped_column(String(255), nullable=True)
+    image_url: Mapped[str] = mapped_column(String(2048), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now)
+    is_banned: Mapped[bool] = mapped_column(default=False)
