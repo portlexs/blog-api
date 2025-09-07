@@ -16,11 +16,6 @@ class UserInfoResponse(BaseModel):
     created_at: datetime
     is_banned: bool
 
-    def model_dump(self, **kwargs):
-        data = super().model_dump(**kwargs)
-        data["id"] = str(data["id"])
-        return data
-
 
 class UserCreateRequest(BaseModel):
     email: EmailStr
