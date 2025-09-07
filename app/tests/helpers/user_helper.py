@@ -7,6 +7,7 @@ from httpx import Response
 class UserHelper:
     def __init__(self, client: TestClient) -> None:
         self.client = client
+        self.default_username = "test_user"
         self.default_email = "test_user@example.com"
         self.default_password = "password123"
 
@@ -14,8 +15,14 @@ class UserHelper:
         headers = {"Authorization": f"Bearer {access_token}"}
         return self.client.get("/api/users/me", headers=headers)
 
-    def create_user(self, email: str, password: str) -> Response:
-        user_data = {"email": email, "password": password}
+    def create_user(
+        self, email: str, password: str, username: str | None = None
+    ) -> Response:
+        user_data = {
+            "email": email,
+            "password": password,
+            "username": username or self.default_username,
+        }
         return self.client.post("/api/users/", json=user_data)
 
     def create_default_user(self) -> Response:
