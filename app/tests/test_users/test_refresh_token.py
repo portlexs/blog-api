@@ -7,9 +7,9 @@ from tests.helpers.user_helper import UserHelper
 class TestRefreshToken:
 
     def test_successful_refresh_token(self, user_helper: UserHelper) -> None:
-        user_helper.create_default_user()
+        user_helper.default_user.register()
 
-        login_response = user_helper.login_default_user()
+        login_response = user_helper.default_user.login()
         access_token = login_response.json()["access_token"]
         refresh_token = login_response.json()["refresh_token"]
 
@@ -27,11 +27,8 @@ class TestRefreshToken:
         assert jwt.decode_token(new_tokens["refresh_token"]) is not None
 
     def test_refresh_with_access_token(self, user_helper: UserHelper) -> None:
-        user_helper.create_default_user()
-        login_response = user_helper.login_default_user()
-        access_token = login_response.json()["access_token"]
+        access_token = user_helper.default_user.register_and_login()
 
-        # refresh token with access token
         refresh_response = user_helper.refresh_user_token(access_token)
 
         assert refresh_response.status_code == status.HTTP_401_UNAUTHORIZED

@@ -7,8 +7,8 @@ from tests.helpers.user_helper import UserHelper
 class TestLoginUser:
 
     def test_successful_login(self, user_helper: UserHelper) -> None:
-        user_helper.create_default_user()
-        login_response = user_helper.login_default_user()
+        user_helper.default_user.register()
+        login_response = user_helper.default_user.login()
 
         assert login_response.status_code == status.HTTP_200_OK
 
@@ -26,9 +26,9 @@ class TestLoginUser:
         assert login_response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_incorrect_password(self, user_helper: UserHelper) -> None:
-        user_helper.create_default_user()
+        user_helper.default_user.register()
         login_response = user_helper.login_user(
-            user_helper.default_email, "wrong_password"
+            user_helper.default_user.email, "wrong_password"
         )
 
         assert login_response.status_code == status.HTTP_401_UNAUTHORIZED

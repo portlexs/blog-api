@@ -25,7 +25,7 @@ class UserService:
         if self.get_user(email=user_in.email):
             raise HTTPException(status_code=400, detail="Email already registered")
 
-        user_data = user_in.model_dump()
+        user_data = user_in.model_dump(mode="json")
         user_data["password"] = hash_password(user_data["password"])
 
         user = User(**user_data)
