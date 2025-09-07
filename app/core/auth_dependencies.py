@@ -2,12 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import Session
 
-import services.users as users_service
 from core import jwt
-from db.dependencies import get_db
 from models.users import User
+from services.users import UserService, get_user_service
 
 
 security = HTTPBearer(auto_error=False)
@@ -15,7 +13,7 @@ security = HTTPBearer(auto_error=False)
 
 def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
-    db: Session = Depends(get_db),
+    user_service: UserService = Depends(get_user_service),
 ) -> User:
     def credentials_exception() -> HTTPException:
         return HTTPException(
@@ -34,7 +32,7 @@ def get_current_user(
     if payload.get("type") != "access":
         raise credentials_exception()
 
-    user = users_service.get_user_by_id(db, payload["id"])
+    user = user_service.get_user(id=payload["id"])
     if user is None:
         raise credentials_exception()
 
