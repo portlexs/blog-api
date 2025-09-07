@@ -24,6 +24,7 @@ async def get_current_user(current_user: CurrentUser) -> UserInfoResponse:
 async def register_user(
     user_in: UserCreateRequest, user_service: UserService = Depends(get_user_service)
 ) -> UserInfoResponse:
+    """Register user in blog"""
     return user_service.register_user(user_in)
 
 
@@ -41,7 +42,7 @@ async def update_user(
     current_user: CurrentUser,
     user_service: UserService = Depends(get_user_service),
 ) -> UserInfoResponse:
-    """Update user in blog by id"""
+    """Update user in blog"""
     return user_service.update_user(current_user, user_in)
 
 
