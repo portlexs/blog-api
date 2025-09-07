@@ -1,7 +1,13 @@
 from fastapi import Depends
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from db.dependencies import get_db
+from schemas.articles import (
+    ArticleInfoResponse,
+    CreateArticleRequest,
+    UpdateArticleRequest,
+)
 
 
 class ArticleService:
@@ -14,13 +20,13 @@ class ArticleService:
     def get_article(self, **filters):
         return self.db.query().filter_by(**filters).one_or_none()
 
-    def create_article(self, article_in):
+    def create_article(self, article_in: CreateArticleRequest) -> ArticleInfoResponse:
         pass
 
-    def update_article(self, article_in):
+    def update_article(self, article_in: UpdateArticleRequest) -> ArticleInfoResponse:
         pass
 
-    def delete_article(self, article_in):
+    def delete_article(self, slug: str) -> Response:
         pass
 
 
