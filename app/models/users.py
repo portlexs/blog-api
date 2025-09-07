@@ -19,5 +19,5 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True)
     bio: Mapped[str] = mapped_column(String(255), nullable=True)
     image_url: Mapped[str] = mapped_column(String(2048), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     is_banned: Mapped[bool] = mapped_column(default=False)
