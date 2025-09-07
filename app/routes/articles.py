@@ -1,36 +1,47 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-router = APIRouter(
-    prefix="/articles",
-    tags=["articles"],
-)
+from services.articles import ArticleService, get_article_service
+
+
+router = APIRouter(prefix="/articles", tags=["articles"])
 
 
 @router.get("/")
-async def get_articles() -> dict:
+async def get_articles(article_service: ArticleService = Depends(get_article_service)):
     """Get all articles in blog"""
-    return {"message": "get_articles()"}
+    return article_service.get_all_articles()
 
 
-@router.get("/{article_id}")
-async def get_article(article_id: int) -> dict:
-    """Get article in blog by id"""
-    return {"message": f"get_article({article_id})"}
+@router.get("/{slug}")
+async def get_article(
+    slug: str, article_service: ArticleService = Depends(get_article_service)
+):
+    """Get article in blog"""
+    return article_service.get_article(slug=slug)
 
 
 @router.post("/")
-async def create_article() -> dict:
+async def create_article(
+    article_in,
+    article_service: ArticleService = Depends(get_article_service),
+):
     """Create article in blog"""
-    return {"message": "create_article()"}
+    return article_service.create_article(article_in=article_in)
 
 
-@router.put("/{article_id}")
-async def update_article(article_id: int) -> dict:
-    """Update article in blog by id"""
-    return {"message": f"update_article({article_id})"}
+@router.put("/{slug}")
+async def update_article(
+    slug: str,
+    article_in,
+    article_service: ArticleService = Depends(get_article_service),
+):
+    """Update article in blog"""
+    return article_service.update_article(slug=slug, article_in=article_in)
 
 
-@router.delete("/{article_id}")
-async def delete_article(article_id: int) -> dict:
-    """Delete article in blog by id"""
-    return {"message": f"delete_article({article_id})"}
+@router.delete("/{slug}")
+async def delete_article(
+    slug: str, article_service: ArticleService = Depends(get_article_service)
+):
+    """Delete article in blog"""
+    return article_service.delete_article(slug=slug)
