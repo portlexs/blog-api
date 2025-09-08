@@ -17,7 +17,7 @@ class ArticleService:
         self.db = db
 
     def get_all_articles(self, user: User) -> List[Article]:
-        return self.db.query(Article).filter_by(user_id=user.id).all()
+        return user.articles
 
     def get_article(self, **filters) -> Article:
         article = self.db.query(Article).filter_by(**filters).one_or_none()
