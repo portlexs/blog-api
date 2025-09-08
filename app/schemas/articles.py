@@ -25,7 +25,6 @@ class ArticleInfoResponse(ArticleCreate):
     id: uuid.UUID
     slug: str = Field(..., min_length=3, max_length=50)
     created_at: datetime
-    is_deleted: bool
 
 
 class AllArticlesResponse(BaseModel):

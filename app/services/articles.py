@@ -51,8 +51,7 @@ class ArticleService:
         if not article:
             raise HTTPException(status_code=404, detail="article not found")
 
-        article.is_deleted = True
-
+        self.db.delete(article)
         self.db.commit()
         self.db.refresh(article)
 

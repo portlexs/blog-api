@@ -24,7 +24,6 @@ class Article(Base):
     body: Mapped[str] = mapped_column(nullable=False)
     tag_list: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
-    is_deleted: Mapped[bool] = mapped_column(default=False)
 
     @validates("title")
     def validate_title(self, key, title):
