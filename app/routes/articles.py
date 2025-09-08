@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 
 
-from core.auth_dependencies import CurrentUser
+from auth.dependencies import CurrentUser
 from schemas.articles import (
     AllArticlesResponse,
     ArticleInfoResponse,

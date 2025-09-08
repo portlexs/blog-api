@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
-from core.auth_dependencies import CurrentUser
+from auth.dependencies import CurrentUser
 from services.users import UserService, get_user_service
 from schemas.users import (
     UserCreateRequest,

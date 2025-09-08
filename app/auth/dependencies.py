@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from core import jwt
+from auth import jwt
 from models.users import User
 from services.users import UserService, get_user_service
 

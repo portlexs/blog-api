@@ -5,7 +5,7 @@ from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
-from core.security import hash_password
+from auth.security import hash_password
 from db.session import Base
 from models.articles import Article
 

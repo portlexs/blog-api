@@ -1,6 +1,6 @@
 from fastapi import status
 
-from core import jwt
+from auth import jwt
 from tests.helpers.user_helper import UserHelper
 
 

@@ -3,8 +3,8 @@ from typing import Tuple
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
-import core.jwt as jwt
-from core.security import verify_password
+import auth.jwt as jwt
+from auth.security import verify_password
 from db.dependencies import get_db
 from models.users import User
 from schemas.users import (
