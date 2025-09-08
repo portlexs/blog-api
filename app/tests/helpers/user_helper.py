@@ -41,21 +41,7 @@ class UserHelper:
     def get_user(self, headers: Dict[str, str]) -> Response:
         return self.client.get("/api/users/me", headers=headers)
 
-    def register_user(
-        self,
-        email: str,
-        password: str,
-        username: str | None = None,
-        bio: str | None = None,
-        image_url: str | None = None,
-    ) -> Response:
-        user_data = {
-            "email": email,
-            "password": password,
-            "username": username,
-            "bio": bio,
-            "image_url": image_url,
-        }
+    def register_user(self, user_data: Dict[str, Any]) -> Response:
         return self.client.post("/api/users/", json=user_data)
 
     def login_user(self, email: str, password: str) -> Response:
