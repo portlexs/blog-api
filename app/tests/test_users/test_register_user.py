@@ -8,7 +8,7 @@ class TestRegisterUser:
     def test_successful_register(self, user_helper: UserHelper) -> None:
         create_response = user_helper.default_user.register()
 
-        assert create_response.status_code == status.HTTP_200_OK
+        assert create_response.status_code == status.HTTP_201_CREATED
 
     def test_email_exists(self, user_helper: UserHelper) -> None:
         user_helper.default_user.register()
