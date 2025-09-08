@@ -3,10 +3,11 @@ from datetime import datetime
 
 from slugify import slugify
 from sqlalchemy import DateTime, ForeignKey, String, func
-from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
 from db.session import Base
+from models.comments import Comment
 
 
 class Article(Base):
@@ -24,6 +25,8 @@ class Article(Base):
     body: Mapped[str] = mapped_column(nullable=False)
     tag_list: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    comments: Mapped[list[Comment]] = relationship(cascade="all, delete-orphan")
 
     @validates("title")
     def validate_title(self, key, title):

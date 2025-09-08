@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from auth.security import hash_password
 from db.session import Base
 from models.articles import Article
+from models.comments import Comment
 
 
 class User(Base):
@@ -25,6 +26,7 @@ class User(Base):
     is_banned: Mapped[bool] = mapped_column(default=False)
 
     articles: Mapped[list["Article"]] = relationship(cascade="all, delete-orphan")
+    comments: Mapped[list["Comment"]] = relationship(cascade="all, delete-orphan")
 
     @validates("password")
     def validate_password(self, key, password: str) -> str:
