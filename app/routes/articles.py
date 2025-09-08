@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from services.articles import ArticleService, get_article_service
 
+from core.auth_dependencies import CurrentUser
 from schemas.articles import (
     AllArticlesResponse,
     ArticleInfoResponse,
@@ -15,34 +16,39 @@ router = APIRouter(prefix="/articles", tags=["articles"])
 
 @router.get("/", response_model=AllArticlesResponse)
 async def get_articles(
+    current_user: CurrentUser,
     article_service: ArticleService = Depends(get_article_service),
 ) -> AllArticlesResponse:
     """Get all articles in blog"""
-    articles = article_service.get_all_articles()
+    articles = article_service.get_all_articles(current_user)
     return AllArticlesResponse(articles=articles)
 
 
 @router.get("/{slug}", response_model=ArticleInfoResponse)
 async def get_article(
-    slug: str, article_service: ArticleService = Depends(get_article_service)
+    current_user: CurrentUser,
+    slug: str,
+    article_service: ArticleService = Depends(get_article_service),
 ) -> ArticleInfoResponse:
     """Get article in blog"""
-    article = article_service.get_article(slug=slug)
+    article = article_service.get_article(slug=slug, user_id=current_user.id)
     return ArticleInfoResponse.model_validate(article)
 
 
 @router.post("/", response_model=ArticleInfoResponse)
 async def create_article(
+    current_user: CurrentUser,
     article_in: ArticleCreate,
     article_service: ArticleService = Depends(get_article_service),
 ) -> ArticleInfoResponse:
     """Create article in blog"""
-    article = article_service.create_article(article_in=article_in)
+    article = article_service.create_article(article_in, current_user)
     return ArticleInfoResponse.model_validate(article)
 
 
 @router.put("/{slug}", response_model=ArticleInfoResponse)
 async def update_article(
+    current_user: CurrentUser,
     slug: str,
     article_in: ArticleUpdate,
     article_service: ArticleService = Depends(get_article_service),
@@ -54,7 +60,9 @@ async def update_article(
 
 @router.delete("/{slug}")
 async def delete_article(
-    slug: str, article_service: ArticleService = Depends(get_article_service)
+    current_user: CurrentUser,
+    slug: str,
+    article_service: ArticleService = Depends(get_article_service),
 ):
     """Delete article in blog"""
     article_service.delete_article(slug=slug)

@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from db.dependencies import get_db
 from models.articles import Article
+from models.users import User
 from schemas.articles import (
     ArticleCreate,
     ArticleUpdate,
@@ -15,14 +16,14 @@ class ArticleService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def get_all_articles(self) -> List[Article]:
-        return self.db.query(Article).all()
+    def get_all_articles(self, user: User) -> List[Article]:
+        return self.db.query(Article).filter_by(user_id=user.id).all()
 
     def get_article(self, **filters) -> Article:
         return self.db.query(Article).filter_by(**filters).one_or_none()
 
-    def create_article(self, article_in: ArticleCreate) -> Article:
-        article = Article(**article_in.model_dump(mode="json"))
+    def create_article(self, article_in: ArticleCreate, user: User) -> Article:
+        article = Article(**article_in.model_dump(mode="json"), user_id=user.id)
 
         if self.get_article(slug=article.slug):
             raise HTTPException(status_code=400, detail="article title already exists")
@@ -33,8 +34,10 @@ class ArticleService:
 
         return article
 
-    def update_article(self, slug: str, article_in: ArticleUpdate) -> Article:
-        article = self.get_article(slug=slug)
+    def update_article(
+        self, slug: str, article_in: ArticleUpdate, user: User
+    ) -> Article:
+        article = self.get_article(slug=slug, user_id=user.id)
         if not article:
             raise HTTPException(status_code=404, detail="article not found")
 
@@ -46,8 +49,8 @@ class ArticleService:
 
         return article
 
-    def delete_article(self, slug: str) -> None:
-        article = self.get_article(slug=slug)
+    def delete_article(self, slug: str, user: User) -> None:
+        article = self.get_article(slug=slug, user_id=user.id)
         if not article:
             raise HTTPException(status_code=404, detail="article not found")
 
