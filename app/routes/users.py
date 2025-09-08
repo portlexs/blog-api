@@ -33,7 +33,8 @@ async def register_user(
     user_in: UserCreateRequest, user_service: UserService = Depends(get_user_service)
 ) -> UserInfoResponse:
     """Register user in blog"""
-    return user_service.register_user(user_in)
+    user = user_service.register_user(user_in)
+    return UserInfoResponse.model_validate(user)
 
 
 @router.post(
@@ -45,7 +46,8 @@ async def login_user(
     user_in: UserLoginRequest, user_service: UserService = Depends(get_user_service)
 ) -> UserLoginResponse:
     """Login user in blog"""
-    return user_service.login_user(user_in)
+    access_token, refresh_token = user_service.login_user(user_in)
+    return UserLoginResponse(access_token=access_token, refresh_token=refresh_token)
 
 
 @router.put(
@@ -59,7 +61,8 @@ async def update_user(
     user_service: UserService = Depends(get_user_service),
 ) -> UserInfoResponse:
     """Update user in blog"""
-    return user_service.update_user(current_user, user_in)
+    user = user_service.update_user(current_user, user_in)
+    return UserInfoResponse.model_validate(user)
 
 
 @router.post(
@@ -71,4 +74,5 @@ async def refresh_token(
     refresh_token: str, user_service: UserService = Depends(get_user_service)
 ) -> UserLoginResponse:
     """Refresh token in blog"""
-    return user_service.refresh_user_token(refresh_token)
+    access_token, refresh_token = user_service.refresh_user_token(refresh_token)
+    return UserLoginResponse(access_token=access_token, refresh_token=refresh_token)
