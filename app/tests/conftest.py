@@ -11,9 +11,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import settings
 from db.session import Base
 from db.dependencies import get_db
+from helpers.article_helper import ArticleHelper
 from helpers.user_helper import UserHelper
 from main import app
-from models.users import User
 
 
 @pytest.fixture(scope="session")
@@ -64,3 +64,8 @@ def client(db_session):
 @pytest.fixture
 def user_helper(client):
     return UserHelper(client)
+
+
+@pytest.fixture
+def article_helper(client):
+    return ArticleHelper(client)
