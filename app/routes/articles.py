@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
-from services.articles import ArticleService, get_article_service
 
 from core.auth_dependencies import CurrentUser
 from schemas.articles import (
@@ -9,12 +8,17 @@ from schemas.articles import (
     ArticleCreate,
     ArticleUpdate,
 )
+from services.articles import ArticleService, get_article_service
 
 
 router = APIRouter(prefix="/articles", tags=["articles"])
 
 
-@router.get("/", response_model=AllArticlesResponse, status_code=200)
+@router.get(
+    "/",
+    response_model=AllArticlesResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def get_articles(
     current_user: CurrentUser,
     article_service: ArticleService = Depends(get_article_service),
@@ -24,7 +28,11 @@ async def get_articles(
     return AllArticlesResponse(articles=articles)
 
 
-@router.get("/{slug}", response_model=ArticleInfoResponse, status_code=200)
+@router.get(
+    "/{slug}",
+    response_model=ArticleInfoResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def get_article(
     current_user: CurrentUser,
     slug: str,
@@ -35,7 +43,11 @@ async def get_article(
     return ArticleInfoResponse.model_validate(article)
 
 
-@router.post("/", response_model=ArticleInfoResponse, status_code=201)
+@router.post(
+    "/",
+    response_model=ArticleInfoResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_article(
     current_user: CurrentUser,
     article_in: ArticleCreate,
@@ -46,7 +58,11 @@ async def create_article(
     return ArticleInfoResponse.model_validate(article)
 
 
-@router.put("/{slug}", response_model=ArticleInfoResponse, status_code=200)
+@router.put(
+    "/{slug}",
+    response_model=ArticleInfoResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def update_article(
     current_user: CurrentUser,
     slug: str,
@@ -60,7 +76,7 @@ async def update_article(
     return ArticleInfoResponse.model_validate(article)
 
 
-@router.delete("/{slug}", response_model=dict, status_code=200)
+@router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_article(
     current_user: CurrentUser,
     slug: str,
@@ -68,4 +84,3 @@ async def delete_article(
 ):
     """Delete article in blog"""
     article_service.delete_article(slug=slug, user=current_user)
-    return {"message": f"delete_article {slug}"}
