@@ -20,13 +20,17 @@ class ArticleService:
         return self.db.query(Article).filter_by(user_id=user.id).all()
 
     def get_article(self, **filters) -> Article:
-        return self.db.query(Article).filter_by(**filters).one_or_none()
+        article = self.db.query(Article).filter_by(**filters).one_or_none()
+        if not article:
+            raise HTTPException(status_code=404, detail="Article not found")
+
+        return article
 
     def create_article(self, article_in: ArticleCreate, user: User) -> Article:
         article = Article(**article_in.model_dump(mode="json"), user_id=user.id)
 
         if self.get_article(slug=article.slug):
-            raise HTTPException(status_code=400, detail="article title already exists")
+            raise HTTPException(status_code=400, detail="Article title already exists")
 
         self.db.add(article)
         self.db.commit()
@@ -38,8 +42,6 @@ class ArticleService:
         self, slug: str, article_in: ArticleUpdate, user: User
     ) -> Article:
         article = self.get_article(slug=slug, user_id=user.id)
-        if not article:
-            raise HTTPException(status_code=404, detail="article not found")
 
         for key, value in article_in.model_dump(exclude_unset=True).items():
             setattr(article, key, value)
@@ -51,8 +53,6 @@ class ArticleService:
 
     def delete_article(self, slug: str, user: User) -> None:
         article = self.get_article(slug=slug, user_id=user.id)
-        if not article:
-            raise HTTPException(status_code=404, detail="article not found")
 
         self.db.delete(article)
         self.db.commit()
