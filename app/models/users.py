@@ -23,6 +23,4 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     is_banned: Mapped[bool] = mapped_column(default=False)
 
-    articles: Mapped[list["Article"]] = relationship(
-        back_populates="author", cascade="all, delete-orphan"
-    )
+    articles: Mapped[list["Article"]] = relationship(cascade="all, delete-orphan")
