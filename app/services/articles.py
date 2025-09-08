@@ -29,7 +29,7 @@ class ArticleService:
     def create_article(self, article_in: ArticleCreate, user: User) -> Article:
         article = Article(**article_in.model_dump(mode="json"), user_id=user.id)
 
-        if self.get_article(slug=article.slug):
+        if self._is_article_exists(slug=article.slug, user=user):
             raise HTTPException(status_code=400, detail="Article title already exists")
 
         self.db.add(article)
@@ -56,7 +56,12 @@ class ArticleService:
 
         self.db.delete(article)
         self.db.commit()
-        self.db.refresh(article)
+
+    def _is_article_exists(self, slug: str, user: User) -> bool:
+        article = (
+            self.db.query(Article).filter_by(slug=slug, user_id=user.id).one_or_none()
+        )
+        return article is not None
 
 
 def get_article_service(db: Session = Depends(get_db)) -> ArticleService:
