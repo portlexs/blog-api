@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 import core.jwt as jwt
-from core.security import hash_password, verify_password
+from core.security import verify_password
 from db.dependencies import get_db
 from models.users import User
 from schemas.users import (
@@ -22,12 +22,12 @@ class UserService:
         return self.db.query(User).filter_by(**filters).one_or_none()
 
     def register_user(self, user_in: UserCreateRequest) -> UserInfoResponse:
-        if self.get_user(email=user_in.email):
-            raise HTTPException(status_code=400, detail="Email already registered")
+        if self.get_user(email=user_in.email) or self.get_user(
+            username=user_in.username
+        ):
+            raise HTTPException(status_code=400, detail="User already exists")
 
         user_data = user_in.model_dump(mode="json")
-        user_data["password"] = hash_password(user_data["password"])
-
         user = User(**user_data)
 
         self.db.add(user)
@@ -51,9 +51,6 @@ class UserService:
 
         if "email" in user_data and self.get_user(email=user_data["email"]):
             raise HTTPException(status_code=400, detail="Email already exists")
-
-        if "password" in user_data:
-            user_data["password"] = hash_password(user_data["password"])
 
         for key, value in user_data.items():
             setattr(user, key, value)

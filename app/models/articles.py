@@ -3,7 +3,7 @@ from datetime import datetime
 
 from slugify import slugify
 from sqlalchemy import DateTime, ForeignKey, String, func
-from sqlalchemy.orm import Mapped, Relationship, mapped_column, validates
+from sqlalchemy.orm import Mapped, mapped_column, validates
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
 from db.session import Base
