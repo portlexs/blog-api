@@ -1,33 +1,60 @@
-from fastapi import Depends
-from fastapi.responses import Response
+from typing import List
+
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from db.dependencies import get_db
+from models.articles import Article
 from schemas.articles import (
-    ArticleInfoResponse,
-    CreateArticleRequest,
-    UpdateArticleRequest,
+    ArticleCreate,
+    ArticleUpdate,
 )
 
 
 class ArticleService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
         self.db = db
 
-    def get_all_articles(self):
-        return self.db.query().all()
+    def get_all_articles(self) -> List[Article]:
+        return self.db.query(Article).all()
 
-    def get_article(self, **filters):
-        return self.db.query().filter_by(**filters).one_or_none()
+    def get_article(self, **filters) -> Article:
+        return self.db.query(Article).filter_by(**filters).one_or_none()
 
-    def create_article(self, article_in: CreateArticleRequest) -> ArticleInfoResponse:
-        pass
+    def create_article(self, article_in: ArticleCreate) -> Article:
+        article = Article(**article_in.model_dump(mode="json"))
 
-    def update_article(self, article_in: UpdateArticleRequest) -> ArticleInfoResponse:
-        pass
+        if self.get_article(slug=article.slug):
+            raise HTTPException(status_code=400, detail="article title already exists")
 
-    def delete_article(self, slug: str) -> Response:
-        pass
+        self.db.add(article)
+        self.db.commit()
+        self.db.refresh(article)
+
+        return article
+
+    def update_article(self, slug: str, article_in: ArticleUpdate) -> Article:
+        article = self.get_article(slug=slug)
+        if not article:
+            raise HTTPException(status_code=404, detail="article not found")
+
+        for key, value in article_in.model_dump(exclude_unset=True).items():
+            setattr(article, key, value)
+
+        self.db.commit()
+        self.db.refresh(article)
+
+        return article
+
+    def delete_article(self, slug: str) -> None:
+        article = self.get_article(slug=slug)
+        if not article:
+            raise HTTPException(status_code=404, detail="article not found")
+
+        article.is_deleted = True
+
+        self.db.commit()
+        self.db.refresh(article)
 
 
 def get_article_service(db: Session = Depends(get_db)) -> ArticleService:
