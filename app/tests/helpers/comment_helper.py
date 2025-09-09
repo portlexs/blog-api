@@ -9,16 +9,19 @@ class DefaultComment:
         self.client = client
         self.body = "This is a test comment."
 
-    def create(self, article_slug: str) -> Response:
+    def create(self, article_slug: str, headers: Dict[str, str]) -> Response:
         comment_data = {"body": self.body}
         return self.client.post(
-            f"/api/articles/{article_slug}/comments", json=comment_data
+            f"/api/articles/{article_slug}/comments",
+            json=comment_data,
+            headers=headers,
         )
 
 
 class CommentHelper:
     def __init__(self, client: TestClient) -> None:
         self.client = client
+        self.default_comment = DefaultComment(client)
 
     def get_comments(self, article_slug: str, headers: Dict[str, str]) -> Response:
         return self.client.get(

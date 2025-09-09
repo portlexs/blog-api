@@ -12,6 +12,7 @@ from config import settings
 from db.session import Base
 from db.dependencies import get_db
 from helpers.article_helper import ArticleHelper
+from helpers.comment_helper import CommentHelper
 from helpers.user_helper import UserHelper
 from main import app
 
@@ -69,3 +70,8 @@ def user_helper(client):
 @pytest.fixture
 def article_helper(client):
     return ArticleHelper(client)
+
+
+@pytest.fixture
+def comment_helper(client):
+    return CommentHelper(client)
