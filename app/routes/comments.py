@@ -1,24 +1,57 @@
-from fastapi import APIRouter
+import uuid
 
-router = APIRouter(
-    prefix="/{article_id}/comments",
-    tags=["comments"],
+from fastapi import APIRouter, Depends, status
+
+from auth.dependencies import CurrentUser
+from schemas.comments import (
+    CommentCreate,
+    CommentInfoResponse,
+    CommentDelete,
+    GetCommentsResponse,
 )
+from services.comments import CommentService, get_comment_service
 
 
-@router.get("/")
-async def get_comments(article_id: int) -> dict:
-    """Get comments list in article"""
-    return {"message": f"get_comments({article_id})"}
+router = APIRouter(prefix="/{article_slug}/comments", tags=["comments"])
 
 
-@router.post("/")
-async def create_comment(article_id: int) -> dict:
+@router.get(
+    "/",
+    response_model=GetCommentsResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_comments(
+    article_slug: str,
+    user: CurrentUser,
+    comment_service: CommentService = Depends(get_comment_service),
+) -> GetCommentsResponse:
+    """Get comments list from article"""
+    comments = comment_service.get_artile_comments(article_slug=article_slug)
+    return GetCommentsResponse(comments=comments)
+
+
+@router.post(
+    "/",
+    response_model=CommentInfoResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_comment(
+    article_slug: str,
+    comment_in: CommentCreate,
+    user: CurrentUser,
+    comment_service: CommentService = Depends(get_comment_service),
+) -> CommentInfoResponse:
     """Create comment in article"""
-    return {"message": f"create_comment({article_id})"}
+    comment = comment_service.create_comment(article_slug, comment_in, user)
+    return CommentInfoResponse.model_validate(comment, mode="json")
 
 
-@router.delete("/{comment_id}")
-async def delete_comments(article_id: int, comment_id: int) -> dict:
+@router.delete("/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_comments(
+    article_slug: str,
+    comment_id: uuid.UUID,
+    user: CurrentUser,
+    comment_service: CommentService = Depends(get_comment_service),
+) -> None:
     """Delete comment in article"""
-    return {"message": f"delete_comments({article_id}/{comment_id})"}
+    comment_service.delete_comment(article_slug, comment_id)
