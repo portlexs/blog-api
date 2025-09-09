@@ -3,11 +3,11 @@ from fastapi import APIRouter, Depends, status
 from auth.dependencies import CurrentUser
 from services.users import UserService, get_user_service
 from schemas.users import (
-    UserCreateRequest,
+    UserCreate,
     UserInfoResponse,
-    UserLoginRequest,
+    UserLogin,
     UserLoginResponse,
-    UserUpdateRequest,
+    UserUpdate,
 )
 
 
@@ -30,7 +30,7 @@ async def get_current_user(current_user: CurrentUser) -> UserInfoResponse:
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    user_in: UserCreateRequest, user_service: UserService = Depends(get_user_service)
+    user_in: UserCreate, user_service: UserService = Depends(get_user_service)
 ) -> UserInfoResponse:
     """Register user in blog"""
     user = user_service.register_user(user_in)
@@ -43,7 +43,7 @@ async def register_user(
     status_code=status.HTTP_200_OK,
 )
 async def login_user(
-    user_in: UserLoginRequest, user_service: UserService = Depends(get_user_service)
+    user_in: UserLogin, user_service: UserService = Depends(get_user_service)
 ) -> UserLoginResponse:
     """Login user in blog"""
     access_token, refresh_token = user_service.login_user(user_in)
@@ -56,7 +56,7 @@ async def login_user(
     status_code=status.HTTP_200_OK,
 )
 async def update_user(
-    user_in: UserUpdateRequest,
+    user_in: UserUpdate,
     current_user: CurrentUser,
     user_service: UserService = Depends(get_user_service),
 ) -> UserInfoResponse:
