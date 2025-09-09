@@ -11,7 +11,7 @@ from schemas.comments import (
 from services.comments import CommentService, get_comment_service
 
 
-router = APIRouter(prefix="/{article_slug}/comments", tags=["comments"])
+router = APIRouter(prefix="/articles/{article_slug}/comments", tags=["comments"])
 
 
 @router.get(

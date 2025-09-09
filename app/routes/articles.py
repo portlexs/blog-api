@@ -29,17 +29,17 @@ async def get_articles(
 
 
 @router.get(
-    "/{slug}",
+    "/{article_slug}",
     response_model=ArticleInfoResponse,
     status_code=status.HTTP_200_OK,
 )
 async def get_article(
     current_user: CurrentUser,
-    slug: str,
+    article_slug: str,
     article_service: ArticleService = Depends(get_article_service),
 ) -> ArticleInfoResponse:
     """Get article in blog"""
-    article = article_service.get_article(slug=slug, user_id=current_user.id)
+    article = article_service.get_article(slug=article_slug, user_id=current_user.id)
     return ArticleInfoResponse.model_validate(article)
 
 
@@ -59,28 +59,28 @@ async def create_article(
 
 
 @router.put(
-    "/{slug}",
+    "/{article_slug}",
     response_model=ArticleInfoResponse,
     status_code=status.HTTP_200_OK,
 )
 async def update_article(
     current_user: CurrentUser,
-    slug: str,
+    article_slug: str,
     article_in: ArticleUpdate,
     article_service: ArticleService = Depends(get_article_service),
 ) -> ArticleInfoResponse:
     """Update article in blog"""
     article = article_service.update_article(
-        slug=slug, article_in=article_in, user=current_user
+        slug=article_slug, article_in=article_in, user=current_user
     )
     return ArticleInfoResponse.model_validate(article)
 
 
-@router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{article_slug}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_article(
     current_user: CurrentUser,
-    slug: str,
+    article_slug: str,
     article_service: ArticleService = Depends(get_article_service),
 ):
     """Delete article in blog"""
-    article_service.delete_article(slug=slug, user=current_user)
+    article_service.delete_article(slug=article_slug, user=current_user)
