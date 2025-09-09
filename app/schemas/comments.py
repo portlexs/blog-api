@@ -9,11 +9,6 @@ class CommentCreate(BaseModel):
     body: str
 
 
-class CommentDelete(BaseModel):
-    id: uuid.UUID
-    article_id: uuid.UUID
-
-
 class CommentInfoResponse(CommentCreate):
     model_config = ConfigDict(from_attributes=True)
 

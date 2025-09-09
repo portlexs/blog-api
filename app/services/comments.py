@@ -56,8 +56,6 @@ class CommentService:
     ) -> None:
         article = article_service.get_article(slug=article_slug)
         comment = self.get_comment(article_id=article.id, id=comment_id)
-        if not comment:
-            raise HTTPException(status_code=404, detail="Comment not found")
 
         self.db.delete(comment)
         self.db.commit()

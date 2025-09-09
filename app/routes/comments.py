@@ -6,7 +6,6 @@ from auth.dependencies import CurrentUser
 from schemas.comments import (
     CommentCreate,
     CommentInfoResponse,
-    CommentDelete,
     GetCommentsResponse,
 )
 from services.comments import CommentService, get_comment_service
