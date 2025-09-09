@@ -1,3 +1,4 @@
+import uuid
 from typing import Any, Dict
 
 from fastapi.testclient import TestClient
@@ -38,7 +39,7 @@ class CommentHelper:
         )
 
     def delete_comment(
-        self, article_slug: str, comment_id: str, headers: Dict[str, str]
+        self, article_slug: str, comment_id: uuid.UUID, headers: Dict[str, str]
     ):
         return self.client.delete(
             f"/api/articles/{article_slug}/comments/{comment_id}", headers=headers
