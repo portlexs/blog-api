@@ -42,7 +42,7 @@ async def create_comment(
 ) -> CommentInfoResponse:
     """Create comment in article"""
     comment = comment_service.create_comment(article_slug, comment_in, user)
-    return CommentInfoResponse.model_validate(comment, mode="json")
+    return CommentInfoResponse.model_validate(comment)
 
 
 @router.delete("/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)

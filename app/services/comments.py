@@ -12,15 +12,12 @@ from services.articles import ArticleService, get_article_service
 
 
 class CommentService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, article_service: ArticleService) -> None:
         self.db = db
+        self.article_service = article_service
 
-    def get_artile_comments(
-        self,
-        article_slug: str,
-        article_service: ArticleService = Depends(get_article_service),
-    ) -> List[Comment]:
-        article = article_service.get_article(slug=article_slug)
+    def get_artile_comments(self, article_slug: str) -> List[Comment]:
+        article = self.article_service.get_article(slug=article_slug)
         return article.comments
 
     def get_comment(self, **filters) -> Comment:
@@ -31,13 +28,9 @@ class CommentService:
         return comment
 
     def create_comment(
-        self,
-        article_slug: str,
-        comment_in: CommentCreate,
-        user: User,
-        article_service: ArticleService = Depends(get_article_service),
+        self, article_slug: str, comment_in: CommentCreate, user: User
     ) -> Comment:
-        article = article_service.get_article(slug=article_slug)
+        article = self.article_service.get_article(slug=article_slug)
         comment = Comment(
             **comment_in.model_dump(mode="json"), user_id=user.id, article_id=article.id
         )
@@ -48,18 +41,16 @@ class CommentService:
 
         return comment
 
-    def delete_comment(
-        self,
-        article_slug: str,
-        comment_id: uuid.UUID,
-        article_service: ArticleService = Depends(get_article_service),
-    ) -> None:
-        article = article_service.get_article(slug=article_slug)
+    def delete_comment(self, article_slug: str, comment_id: uuid.UUID) -> None:
+        article = self.article_service.get_article(slug=article_slug)
         comment = self.get_comment(article_id=article.id, id=comment_id)
 
         self.db.delete(comment)
         self.db.commit()
 
 
-def get_comment_service(db: Session = Depends(get_db)) -> CommentService:
-    return CommentService(db)
+def get_comment_service(
+    db: Session = Depends(get_db),
+    article_service: ArticleService = Depends(get_article_service),
+) -> CommentService:
+    return CommentService(db, article_service)
