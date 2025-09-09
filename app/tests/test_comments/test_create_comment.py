@@ -53,3 +53,21 @@ class TestCreateComment:
         )
 
         assert create_response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_create_comment_with_empty_body(
+        self,
+        user_helper: UserHelper,
+        article_helper: ArticleHelper,
+        comment_helper: CommentHelper,
+    ) -> None:
+        access_token = user_helper.default_user.register_and_login()
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+        create_article_response = article_helper.default_article.create_article(headers)
+        article_slug = create_article_response.json()["slug"]
+
+        create_response = comment_helper.create_comment(
+            article_slug, comment_data={"body": ""}, headers=headers
+        )
+
+        assert create_response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
