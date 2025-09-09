@@ -9,7 +9,7 @@ class DefaultComment:
         self.client = client
         self.body = "This is a test comment."
 
-    def create(self, article_slug: str, headers: Dict[str, str]) -> Response:
+    def create_comment(self, article_slug: str, headers: Dict[str, str]) -> Response:
         comment_data = {"body": self.body}
         return self.client.post(
             f"/api/articles/{article_slug}/comments",
