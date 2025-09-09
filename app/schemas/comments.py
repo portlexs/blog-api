@@ -2,11 +2,11 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CommentCreate(BaseModel):
-    body: str
+    body: str = Field(..., min_length=1)
 
 
 class CommentInfoResponse(CommentCreate):
