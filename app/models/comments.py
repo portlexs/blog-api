@@ -3,7 +3,7 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.session import Base
 
@@ -22,3 +22,6 @@ class Comment(Base):
     )
     body: Mapped[str] = mapped_column(String(1024), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    user = relationship("User", back_populates="comments")
+    article = relationship("Article", back_populates="comments")

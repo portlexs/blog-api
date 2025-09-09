@@ -26,7 +26,9 @@ class User(Base):
     is_banned: Mapped[bool] = mapped_column(default=False)
 
     articles: Mapped[list["Article"]] = relationship(cascade="all, delete-orphan")
-    comments: Mapped[list["Comment"]] = relationship(cascade="all, delete-orphan")
+    comments: Mapped[list["Comment"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
     @validates("password")
     def validate_password(self, key, password: str) -> str:

@@ -26,7 +26,9 @@ class Article(Base):
     tag_list: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
-    comments: Mapped[list[Comment]] = relationship(cascade="all, delete-orphan")
+    comments: Mapped[list[Comment]] = relationship(
+        back_populates="article", cascade="all, delete-orphan"
+    )
 
     @validates("title")
     def validate_title(self, key, title):
