@@ -53,7 +53,5 @@ class UserHelper:
     ) -> Response:
         return self.client.put("/api/users/me", headers=headers, json=user_data)
 
-    def refresh_user_token(self, refresh_token: str) -> Response:
-        return self.client.post(
-            "/api/users/refresh", params={"refresh_token": refresh_token}
-        )
+    def refresh_user_token(self) -> Response:
+        return self.client.post("/api/users/refresh")

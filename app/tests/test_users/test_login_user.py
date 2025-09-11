@@ -16,10 +16,6 @@ class TestLoginUser:
         access_token = login_response.json()["access_token"]
         assert jwt.decode_token(access_token) is not None
 
-        assert "refresh_token" in login_response.json()
-        refresh_token = login_response.json()["refresh_token"]
-        assert jwt.decode_token(refresh_token) is not None
-
     def test_incorrect_email(self, user_helper: UserHelper) -> None:
         login_response = user_helper.login_user("test_user@example.com", "password123")
 
