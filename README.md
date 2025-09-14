@@ -37,13 +37,15 @@
 git clone https://github.com/portlexs/microservice-architecture
 ```
 
-2. Запустите сборку Docker образа:
+2. Настрйте переменные окружения. Пример переменных окружения представлен в файле `.env.example`.
+
+3. Запустите сборку Docker образа:
 
 ```bash
 docker compose --profile default up --build -d
 ```
 
-3. Обновите зависимости Alembic:
+4. Обновите зависимости Alembic:
 
 ```bash
 docker exec -it blog_api sh
@@ -51,7 +53,7 @@ cd app/
 alembic upgrade head
 ```
 
-4. Переходите по ссылке http://localhost:8000/docs
+5. Переходите по ссылке http://localhost:8000/docs
 
 ## Локальный запуск приложения
 
