@@ -6,16 +6,15 @@ FROM python:${PYTHON_VERSION}-slim as base
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update && apt-get install -y dos2unix
 
 WORKDIR /app
 
 # Install Poetry
 RUN pip install --no-cache-dir poetry
 
-COPY pyproject.toml poetry.lock*  ./
+COPY pyproject.toml poetry.lock  ./
 
 RUN poetry config virtualenvs.create false \
     && poetry install --no-root --no-interaction --no-ansi
