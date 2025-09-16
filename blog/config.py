@@ -27,7 +27,7 @@ class DBSettings(BaseModel):
     @computed_field
     def url(self) -> str:
         return (
-            f"postgresql+psycopg2://{self.user}:{self.encoded_password}"
+            f"postgresql+asyncpg://{self.user}:{self.encoded_password}"
             f"@{self.host}:{self.port}/{self.name}"
         )
 
