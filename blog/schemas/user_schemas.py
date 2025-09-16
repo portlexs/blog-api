@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl
 
 
 class UserCreate(BaseModel):
@@ -14,6 +14,8 @@ class UserCreate(BaseModel):
 
 
 class PublicUser(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID = Field(..., default_factory=uuid.uuid4)
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
