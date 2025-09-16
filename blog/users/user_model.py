@@ -5,7 +5,7 @@ from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
-# from auth.security import hash_password
+from auth.security import hash_password
 from database.session import Base
 
 
@@ -23,4 +23,4 @@ class User(Base):
 
     @validates("password")
     def validate_password(self, key, password: str) -> str:
-        return password
+        return hash_password(password)
