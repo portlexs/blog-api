@@ -2,8 +2,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
-from users.user_service import UserService
+from users.dependencies import get_user_service
 from users.user_schemas import UserCreate, PublicUser
+from users.user_service import UserService
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -14,7 +16,7 @@ router = APIRouter(prefix="/users", tags=["users"])
     status_code=status.HTTP_200_OK,
 )
 async def register_user(
-    user_in: UserCreate, service: Annotated[UserService, Depends()]
+    user_in: UserCreate, service: Annotated[UserService, Depends(get_user_service)]
 ) -> PublicUser:
     user = await service.create_user(user_in)
     return PublicUser.model_validate(user)
