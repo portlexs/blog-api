@@ -6,5 +6,5 @@ from database.session import SessionLocal
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with SessionLocal() as db:
-        yield db
+    async with SessionLocal() as session:
+        yield session
