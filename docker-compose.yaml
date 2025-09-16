@@ -1,0 +1,45 @@
+services:
+  app:
+    build: .
+    container_name: blog_api
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${API__PORT:-8000}:8000"
+    volumes:
+      - .:/app:cached
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "bash -c 'curl --fail --silent --show-error http://localhost:8000/api/health || exit 1'",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles: ["default"]
+
+  db:
+    image: postgres:17
+    container_name: blog_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB__NAME}
+      POSTGRES_USER: ${DB__USER}
+      POSTGRES_PASSWORD: ${DB__PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB__USER} -d $${DB__NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+    profiles: ["default", "dev"]
+
+volumes:
+  postgres_data:
