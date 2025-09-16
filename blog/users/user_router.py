@@ -16,7 +16,8 @@ router = APIRouter(prefix="/users", tags=["users"])
     status_code=status.HTTP_200_OK,
 )
 async def register_user(
-    user_in: UserCreate, service: Annotated[UserService, Depends(get_user_service)]
+    service: Annotated[UserService, Depends(get_user_service)],
+    user_in: UserCreate = Depends(),
 ) -> PublicUser:
     user = await service.create_user(user_in)
     return PublicUser.model_validate(user)
