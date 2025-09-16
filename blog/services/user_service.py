@@ -1,8 +1,7 @@
-from users.user_schemas import UserCreate
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from users.user_model import User
+from models.user_model import User
+from schemas.user_schemas import UserCreate
 
 
 class UserService:
