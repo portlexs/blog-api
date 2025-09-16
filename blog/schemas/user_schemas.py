@@ -5,6 +5,17 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl
 
 
+class PublicUser(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(..., default_factory=uuid.uuid4)
+    username: str = Field(..., min_length=3, max_length=50)
+    biography: Optional[str] = Field(default=None)
+    avatar_url: Optional[HttpUrl] = Field(default=None)
+    created_at: datetime
+    is_active: bool
+
+
 class UserCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
@@ -13,13 +24,6 @@ class UserCreate(BaseModel):
     avatar_url: Optional[HttpUrl] = Field(default=None)
 
 
-class PublicUser(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: uuid.UUID = Field(..., default_factory=uuid.uuid4)
-    username: str = Field(..., min_length=3, max_length=50)
-    email: EmailStr
-    biography: Optional[str] = Field(default=None)
-    avatar_url: Optional[HttpUrl] = Field(default=None)
-    created_at: datetime
-    is_active: bool
+class UserSearch(BaseModel):
+    id: Optional[uuid.UUID] = Field(default=None)
+    username: Optional[str] = Field(default=None, min_length=3, max_length=50)
