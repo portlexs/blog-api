@@ -1,6 +1,6 @@
 import uuid
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timezone
+from typing import Optional, Union
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl
 
@@ -12,8 +12,8 @@ class PublicUser(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     biography: Optional[str] = Field(default=None)
     avatar_url: Optional[HttpUrl] = Field(default=None)
-    created_at: datetime
-    is_active: bool
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    is_active: bool = Field(default=True)
 
 
 class UserCreate(BaseModel):
@@ -24,6 +24,10 @@ class UserCreate(BaseModel):
     avatar_url: Optional[HttpUrl] = Field(default=None)
 
 
+class UserLogin(BaseModel):
+    login: Union[str, EmailStr] = Field(..., min_length=3, max_length=50)
+    password: str = Field(..., min_length=8)
+
+
 class UserSearch(BaseModel):
-    id: Optional[uuid.UUID] = Field(default=None)
-    username: Optional[str] = Field(default=None, min_length=3, max_length=50)
+    username: str = Field(..., min_length=3, max_length=50)
