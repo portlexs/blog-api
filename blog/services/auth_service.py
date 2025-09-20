@@ -28,9 +28,9 @@ class AuthService:
         if existing_user is not None:
             raise UserAlreadyExistsError()
 
-        user_data = user_in.model_dump(mode="json")
-        user = await self.user_repository.create_user(user_data)
-        validated_user_data = PublicUser.model_validate(user)
+        user = User(**user_in.model_dump(mode="json"))
+        new_user = await self.user_repository.create_user(user)
+        validated_user_data = PublicUser.model_validate(new_user)
 
         tokens = self._create_tokens_pair(validated_user_data)
         return tokens
