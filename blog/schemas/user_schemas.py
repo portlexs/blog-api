@@ -31,3 +31,11 @@ class UserLogin(BaseModel):
 
 class UserSearch(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
+
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = Field(default=None, min_length=3, max_length=50)
+    email: Optional[EmailStr] = Field(default=None)
+    password: Optional[str] = Field(default=None, min_length=8)
+    biography: Optional[str] = Field(default=None)
+    avatar_url: Optional[HttpUrl] = Field(default=None)

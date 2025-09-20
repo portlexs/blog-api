@@ -30,9 +30,23 @@ class UserRepository:
         result = await self.session.execute(query)
         return result.scalars().one_or_none()
 
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        query = select(User).where(User.email == email)
+        result = await self.session.execute(query)
+        return result.scalars().one_or_none()
+
     async def get_user_by_email_or_username(
         self, email: str, username: str
     ) -> Optional[User]:
         query = select(User).where(or_(User.email == email, User.username == username))
         result = await self.session.execute(query)
         return result.scalars().one_or_none()
+
+    async def update_user(self, user: User, user_data: Dict[str, Any]) -> User:
+        for key, value in user_data.items():
+            setattr(user, key, value)
+
+        await self.session.commit()
+        await self.session.refresh(user)
+
+        return user
