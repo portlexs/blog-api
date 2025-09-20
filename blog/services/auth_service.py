@@ -63,6 +63,12 @@ class AuthService:
 
         return user
 
+    def refresh_tokens(self, current_user: User) -> Tuple[str, str]:
+        user_data = PublicUser.model_validate(current_user)
+
+        tokens = self._create_tokens_pair(user_data)
+        return tokens
+
     def _create_tokens_pair(self, user_data: PublicUser) -> Tuple[str, str]:
         access_token = self.jwt_service.create_token(TokenType.ACCESS, user_data)
         refresh_token = self.jwt_service.create_token(TokenType.REFRESH, user_data)

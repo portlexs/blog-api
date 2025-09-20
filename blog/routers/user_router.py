@@ -19,8 +19,8 @@ router = APIRouter(prefix="/users", tags=["users"])
     response_model=PublicUser,
     status_code=status.HTTP_200_OK,
 )
-async def get_current_user(user: CurrentUserDep) -> PublicUser:
-    return PublicUser.model_validate(user)
+async def get_current_user(current_user: CurrentUserDep) -> PublicUser:
+    return PublicUser.model_validate(current_user)
 
 
 @router.get(
@@ -29,7 +29,9 @@ async def get_current_user(user: CurrentUserDep) -> PublicUser:
     status_code=status.HTTP_200_OK,
 )
 async def search_user(
-    _user: CurrentUserDep, user_service: UserServiceDep, user_in: UserSearch = Depends()
+    _current_user: CurrentUserDep,
+    user_service: UserServiceDep,
+    user_in: UserSearch = Depends(),
 ) -> PublicUser:
     user = await user_service.get_user(user_in)
     return PublicUser.model_validate(user)
@@ -63,9 +65,9 @@ async def login_user(auth_service: AuthServiceDep, user_in: UserLogin) -> AuthTo
     status_code=status.HTTP_200_OK,
 )
 async def update_user(
-    user: CurrentUserDep, user_service: UserServiceDep, user_in: UserUpdate
+    current_user: CurrentUserDep, user_service: UserServiceDep, user_in: UserUpdate
 ) -> PublicUser:
-    user = await user_service.update_user(user, user_in)
+    user = await user_service.update_user(current_user, user_in)
     return PublicUser.model_validate(user)
 
 
@@ -73,5 +75,19 @@ async def update_user(
     path="/me/delete",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_user(user: CurrentUserDep, user_service: UserServiceDep) -> None:
-    await user_service.delete_user(user)
+async def delete_user(
+    current_user: CurrentUserDep, user_service: UserServiceDep
+) -> None:
+    await user_service.delete_user(current_user)
+
+
+@router.post(
+    path="/me/refresh",
+    response_model=AuthTokens,
+    status_code=status.HTTP_200_OK,
+)
+async def refresh_tokens(
+    current_user: CurrentUserDep, auth_service: AuthServiceDep
+) -> AuthTokens:
+    access_token, refresh_token = auth_service.refresh_tokens(current_user)
+    return AuthTokens(access_token=access_token, refresh_token=refresh_token)
