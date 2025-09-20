@@ -6,9 +6,9 @@ authors = [
     {name = "portlexs",email = "portnyagin924@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
-    "pydantic (>=2.11.9,<3.0.0)",
+    "pydantic[email] (>=2.11.9,<3.0.0)",
     "pydantic-settings (>=2.10.1,<3.0.0)",
     "fastapi (>=0.116.1,<0.117.0)",
     "uvicorn (>=0.35.0,<0.36.0)",
@@ -16,6 +16,8 @@ dependencies = [
     "sqlalchemy (>=2.0.43,<3.0.0)",
     "asyncpg (>=0.30.0,<0.31.0)",
     "passlib (>=1.7.4,<2.0.0)",
+    "slugify (>=0.0.1,<0.0.2)",
+    "python-jose (>=3.5.0,<4.0.0)",
 ]
 
 
