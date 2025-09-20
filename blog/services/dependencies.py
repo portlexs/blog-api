@@ -3,7 +3,9 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from auth.security import SecurityDep
 from config import settings
+from models.user_model import User
 from repositories.dependencies import UserRepositoryDep
 from services.auth_service import AuthService
 from services.jwt_service import JWTService
@@ -24,12 +26,20 @@ def get_auth_service(
     return AuthService(user_repository, jwt_service)
 
 
+AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
+
+
 def get_user_service(user_repository: UserRepositoryDep) -> UserService:
     return UserService(user_repository)
 
 
-AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 
 
-__all__ = ["AuthServiceDep", "JWTServiceDep", "UserServiceDep"]
+async def get_current_user(
+    auth_service: AuthServiceDep, credentials: SecurityDep
+) -> User:
+    return await auth_service.get_current_user(credentials)
+
+
+CurrentUserDep = Annotated[User, Depends(get_current_user)]

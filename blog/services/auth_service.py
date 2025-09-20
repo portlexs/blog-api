@@ -1,10 +1,14 @@
 from typing import Tuple
 
+from fastapi.security import HTTPAuthorizationCredentials
+
 from auth.security import verify_password
+from exceptions.credentials_exceptions import CredentialsException
 from exceptions.user_exceptions import (
     UserAlreadyExistsError,
     InvalidLoginOrPasswordError,
 )
+from models.user_model import User
 from repositories.user_repository import UserRepository
 from schemas.user_schemas import PublicUser, UserCreate, UserLogin
 from services.jwt_service import JWTService, TokenType
@@ -42,6 +46,22 @@ class AuthService:
 
         tokens = self._create_tokens_pair(user_data)
         return tokens
+
+    async def get_current_user(self, credentials: HTTPAuthorizationCredentials) -> User:
+        if credentials is None:
+            raise CredentialsException("Credentials not found")
+
+        payload = self.jwt_service.decode_token(credentials.credentials)
+        if payload is None or payload.token_type != "access":
+            raise CredentialsException(f"Invalid token")
+
+        user = await self.user_repository.get_user_by_id(payload.user_data.id)
+        if user is None:
+            raise CredentialsException("User not found")
+        elif user.is_active is False:
+            raise CredentialsException("User is not active")
+
+        return user
 
     def _create_tokens_pair(self, user_data: PublicUser) -> Tuple[str, str]:
         access_token = self.jwt_service.create_token(TokenType.ACCESS, user_data)

@@ -1,5 +1,12 @@
+from typing import Annotated, Optional
+
+from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 
+
+security = HTTPBearer(auto_error=False)
+SecurityDep = Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)]
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
