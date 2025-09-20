@@ -6,7 +6,8 @@ from fastapi import Depends
 from auth.security import SecurityDep
 from config import settings
 from models.user_model import User
-from repositories.dependencies import UserRepositoryDep
+from repositories.dependencies import ArticleRepositoryDep, UserRepositoryDep
+from services.article_service import ArticleService
 from services.auth_service import AuthService
 from services.jwt_service import JWTService
 from services.user_service import UserService
@@ -43,3 +44,12 @@ async def get_current_user(
 
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
+
+
+async def get_article_service(
+    article_repository: ArticleRepositoryDep,
+) -> ArticleService:
+    return ArticleService(article_repository)
+
+
+ArticleServiceDep = Annotated[ArticleService, Depends(get_article_service)]
