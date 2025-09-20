@@ -69,3 +69,11 @@ async def update_user(
 ) -> PublicUser:
     user = await user_service.update_user(user, user_in)
     return PublicUser.model_validate(user)
+
+
+@router.delete(
+    path="/me/delete",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_user(user: CurrentUserDep, user_service: UserServiceDep) -> None:
+    await user_service.delete_user(user)

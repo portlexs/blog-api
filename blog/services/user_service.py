@@ -33,4 +33,5 @@ class UserService:
 
         return await self.user_repository.update_user(user, user_data)
 
-    # TODO: delete user
+    async def delete_user(self, user: User) -> None:
+        await self.user_repository.update_user(user, {"is_active": False})
