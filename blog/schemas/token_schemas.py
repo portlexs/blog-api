@@ -1,8 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
-from pydantic_settings import SettingsConfigDict
+from pydantic import BaseModel, field_serializer
 
 from schemas.user_schemas import PublicUser
 
@@ -14,9 +13,13 @@ class TokenPayload(BaseModel):
     iat: datetime
     user_data: PublicUser
 
-    model_config = SettingsConfigDict(
-        json_encoders={datetime: lambda dt: int(dt.timestamp())},
-    )
+    @field_serializer("exp")
+    def serialize_exp(self, value: datetime) -> int:
+        return int(value.timestamp())
+
+    @field_serializer("iat")
+    def serialize_iat(self, value: datetime) -> int:
+        return int(value.timestamp())
 
 
 class AuthTokens(BaseModel):
