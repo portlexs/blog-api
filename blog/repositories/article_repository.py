@@ -18,11 +18,15 @@ class ArticleRepository:
         return result.scalars().all()
 
     async def get_article(
-        self, article_slug: str, user_id: uuid.UUID
+        self, article_slug: str, user_id: Optional[uuid.UUID]
     ) -> Optional[Article]:
-        article = select(Article).where(
-            Article.slug == article_slug, Article.user_id == user_id
-        )
+        if user_id:
+            article = select(Article).where(
+                Article.slug == article_slug, Article.user_id == user_id
+            )
+        else:
+            article = select(Article).where(Article.slug == article_slug)
+
         result = await self.session.execute(article)
         return result.scalars().one_or_none()
 

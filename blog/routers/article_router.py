@@ -22,7 +22,7 @@ async def get_articles(
     current_user: CurrentUserDep,
     article_service: ArticleServiceDep,
 ) -> AllArticles:
-    articles = await article_service.get_all_articles(current_user)
+    articles = await article_service.get_all_articles(current_user.id)
     return AllArticles(articles=articles)
 
 
@@ -36,7 +36,7 @@ async def get_article(
     current_user: CurrentUserDep,
     article_service: ArticleServiceDep,
 ) -> PublicArticle:
-    article = await article_service.get_article(article_slug, current_user)
+    article = await article_service.get_article(article_slug, current_user.id)
     return PublicArticle.model_validate(article)
 
 
@@ -50,7 +50,7 @@ async def create_article(
     article_service: ArticleServiceDep,
     article_in: ArticleCreate,
 ) -> PublicArticle:
-    article = await article_service.create_article(article_in, current_user)
+    article = await article_service.create_article(article_in, current_user.id)
     return PublicArticle.model_validate(article)
 
 
@@ -66,7 +66,7 @@ async def update_article(
     article_in: ArticleUpdate,
 ) -> PublicArticle:
     article = await article_service.update_article(
-        article_slug, article_in, current_user
+        article_slug, article_in, current_user.id
     )
     return PublicArticle.model_validate(article)
 
@@ -80,4 +80,4 @@ async def delete_article(
     current_user: CurrentUserDep,
     article_service: ArticleServiceDep,
 ) -> None:
-    await article_service.delete_article(article_slug, current_user)
+    await article_service.delete_article(article_slug, current_user.id)
