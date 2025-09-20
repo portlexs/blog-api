@@ -6,9 +6,14 @@ from fastapi import Depends
 from auth.security import SecurityDep
 from config import settings
 from models.user_model import User
-from repositories.dependencies import ArticleRepositoryDep, UserRepositoryDep
+from repositories.dependencies import (
+    ArticleRepositoryDep,
+    CommentRepositoryDep,
+    UserRepositoryDep,
+)
 from services.article_service import ArticleService
 from services.auth_service import AuthService
+from services.comment_service import CommentService
 from services.jwt_service import JWTService
 from services.user_service import UserService
 
@@ -53,3 +58,12 @@ async def get_article_service(
 
 
 ArticleServiceDep = Annotated[ArticleService, Depends(get_article_service)]
+
+
+def get_comment_service(
+    comment_repository: CommentRepositoryDep, article_service: ArticleServiceDep
+) -> CommentService:
+    return CommentService(comment_repository, article_service)
+
+
+CommentServiceDep = Annotated[CommentService, Depends(get_comment_service)]
