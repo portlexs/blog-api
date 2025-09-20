@@ -22,6 +22,18 @@ services:
       retries: 5
     profiles: ["default"]
 
+  migrate:
+    build: .
+    container_name: blog_migrate
+    command: bash -c "sleep 5 && alembic upgrade head"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["default", "dev"]
+    restart: "no"
+
   db:
     image: postgres:17
     container_name: blog_db
