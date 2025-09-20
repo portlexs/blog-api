@@ -41,7 +41,7 @@ async def search_user(
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    auth_service: AuthServiceDep, user_in: UserCreate = Depends()
+    auth_service: AuthServiceDep, user_in: UserCreate
 ) -> AuthTokens:
     access_token, refresh_token = await auth_service.register_user(user_in)
     return AuthTokens(access_token=access_token, refresh_token=refresh_token)
@@ -52,9 +52,7 @@ async def register_user(
     response_model=AuthTokens,
     status_code=status.HTTP_200_OK,
 )
-async def login_user(
-    auth_service: AuthServiceDep, user_in: UserLogin = Depends()
-) -> AuthTokens:
+async def login_user(auth_service: AuthServiceDep, user_in: UserLogin) -> AuthTokens:
     access_token, refresh_token = await auth_service.login_user(user_in)
     return AuthTokens(access_token=access_token, refresh_token=refresh_token)
 
