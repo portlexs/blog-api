@@ -1,42 +1,34 @@
 from typing import Annotated, Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from auth import jwt
+from exceptions.credentials_exceptions import CredentialsException
 from models.user_model import User
-from services.dependencies import UserServiceDep
+from services.dependencies import JWTServiceDep, UserRepositoryDep
 
 
 security = HTTPBearer(auto_error=False)
-
-
-def credentials_exception() -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+SecurityDep = Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)]
 
 
 async def get_current_user(
-    credentials: Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)],
-    user_service: UserServiceDep,
+    credentials: SecurityDep,
+    user_repository: UserRepositoryDep,
+    jwt_service: JWTServiceDep,
 ) -> User:
     if credentials is None:
-        raise credentials_exception()
+        raise CredentialsException("Credentials not found")
 
-    payload = jwt.decode_token(credentials.credentials)
-    if payload is None or payload.get("id") is None:
-        raise credentials_exception()
+    payload = jwt_service.decode_token(credentials.credentials)
+    if payload is None or payload.token_type != "access":
+        raise CredentialsException(f"Invalid token")
 
-    if payload.get("type") != "access":
-        raise credentials_exception()
-
-    try:
-        user = await user_service.get_user(id=payload["id"])
-    except HTTPException:
-        raise credentials_exception()
+    user = await user_repository.get_user_by_id(payload.user_data.id)
+    if user is None:
+        raise CredentialsException("User not found")
+    elif user.is_active is False:
+        raise CredentialsException("User is not active")
 
     return user
 
