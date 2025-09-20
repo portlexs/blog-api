@@ -2,7 +2,8 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-from jose import jwt
+from jose import jwt, JWTError
+from pydantic import ValidationError
 
 from enums.token_type import TokenType
 from schemas.token_schemas import TokenPayload
@@ -35,5 +36,8 @@ class JWTService:
         return token
 
     def decode_token(self, token: str) -> Optional[TokenPayload]:
-        payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
-        return TokenPayload(**payload)
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            return TokenPayload(**payload)
+        except (JWTError, ValidationError):
+            return None
