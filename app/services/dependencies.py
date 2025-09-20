@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from auth.security import SecurityDep
+from core.security import SecurityDep
 from config import settings
 from models.user_model import User
 from repositories.dependencies import (

@@ -2,7 +2,7 @@ from typing import Tuple
 
 from fastapi.security import HTTPAuthorizationCredentials
 
-from auth.security import verify_password
+from core.security import verify_password
 from exceptions.credentials_exceptions import CredentialsException
 from exceptions.user_exceptions import (
     UserAlreadyExistsError,
