@@ -1,36 +1,23 @@
-from exceptions.user_exceptions import UserNotFound
+from exceptions.user_exceptions import UserNotFoundError
 from models.user_model import User
 from repositories.user_repository import UserRepository
-from schemas.user_schemas import UserCreate, UserSearch
-from validators.user_validator import UserValidator
+from schemas.user_schemas import UserSearch
 
 
 class UserService:
-    def __init__(self, repository: UserRepository, validator: UserValidator) -> None:
-        self.repository = repository
-        self.validator = validator
+    def __init__(self, user_repository: UserRepository) -> None:
+        self.user_repository = user_repository
 
     async def get_user(self, user_in: UserSearch) -> User:
         """
         Returns a user from the database.
         Throws an exception if user not found.
         """
-        search_user_data = user_in.model_dump(mode="json", exclude_none=True)
-        user = await self.repository.get_user(**search_user_data)
+        user = await self.user_repository.get_user_by_username(user_in.username)
         if user is None:
-            raise UserNotFound()
+            raise UserNotFoundError()
         return user
 
-    async def create_user(self, user_in: UserCreate) -> User:
-        """
-        Creates and return a new user in the database.
-        Throws an exception if the user already exists.
-        """
-        await self.validator.validate_unique_fields(
-            username=user_in.username, email=user_in.email
-        )
+    # TODO: update user
 
-        user_data = user_in.model_dump(mode="json")
-        user = await self.repository.create_user(user_data)
-
-        return user
+    # TODO: delete user

@@ -1,17 +1,25 @@
 from fastapi import HTTPException, status
 
 
-class UserAlreadyExists(HTTPException):
-    def __init__(self, field: str, value: str) -> None:
+class UserAlreadyExistsError(HTTPException):
+    def __init__(self) -> None:
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"User with {field} '{value}' already exists",
+            detail=f"User already exists",
         )
 
 
-class UserNotFound(HTTPException):
+class UserNotFoundError(HTTPException):
     def __init__(self) -> None:
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User not found",
+        )
+
+
+class InvalidLoginOrPasswordError(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid login or password",
         )

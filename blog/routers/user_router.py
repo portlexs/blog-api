@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, status
 
 from auth.dependencies import CurrentUserDep
-from schemas.user_schemas import PublicUser, UserCreate, UserSearch
-from services.dependencies import UserServiceDep
+from schemas.token_schemas import AuthTokens
+from schemas.user_schemas import PublicUser, UserCreate, UserLogin, UserSearch
+from services.dependencies import AuthServiceDep, UserServiceDep
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -31,11 +32,23 @@ async def search_user(
 
 @router.post(
     path="/register",
-    response_model=PublicUser,
+    response_model=AuthTokens,
     status_code=status.HTTP_200_OK,
 )
 async def register_user(
-    user_service: UserServiceDep, user_in: UserCreate = Depends()
-) -> PublicUser:
-    user = await user_service.create_user(user_in)
-    return PublicUser.model_validate(user)
+    auth_service: AuthServiceDep, user_in: UserCreate = Depends()
+) -> AuthTokens:
+    access_token, refresh_token = await auth_service.register_user(user_in)
+    return AuthTokens(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post(
+    path="/login",
+    response_model=AuthTokens,
+    status_code=status.HTTP_200_OK,
+)
+async def login_user(
+    auth_service: AuthServiceDep, user_in: UserLogin = Depends()
+) -> AuthTokens:
+    access_token, refresh_token = await auth_service.login_user(user_in)
+    return AuthTokens(access_token=access_token, refresh_token=refresh_token)
