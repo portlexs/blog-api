@@ -15,7 +15,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "bash -c 'curl --fail --silent --show-error http://localhost:8000/api/health || exit 1'",
+          "curl --fail --silent --show-error http://${API__HOST}:${API__PORT}/api/health || exit 1",
         ]
       interval: 10s
       timeout: 5s
