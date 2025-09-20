@@ -3,10 +3,12 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from auth.security import hash_password
 from database.session import Base
+from models.article_model import Article
+from models.comment_model import Comment
 
 
 class User(Base):
@@ -21,6 +23,12 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     is_active: Mapped[bool] = mapped_column(default=True)
 
+    articles: Mapped[list["Article"]] = relationship("Article", back_populates="user")
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="user")
+
     @validates("password")
     def validate_password(self, key, password: str) -> str:
         return hash_password(password)
+
+
+__all__ = ["User"]
