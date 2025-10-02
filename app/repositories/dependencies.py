@@ -2,10 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from database.dependencies import SessionDep
-from repositories.article_repository import ArticleRepository
-from repositories.comment_repository import CommentRepository
-from repositories.user_repository import UserRepository
+from app.database.dependencies import SessionDep
+from app.repositories.article_repository import ArticleRepository
+from app.repositories.comment_repository import CommentRepository
+from app.repositories.user_repository import UserRepository
 
 
 def get_article_repository(session: SessionDep) -> ArticleRepository:

@@ -3,19 +3,19 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from core.security import SecurityDep
-from config import settings
-from models.user_model import User
-from repositories.dependencies import (
+from app.core.security import SecurityDep
+from app.config import settings
+from app.models.user_model import User
+from app.repositories.dependencies import (
     ArticleRepositoryDep,
     CommentRepositoryDep,
     UserRepositoryDep,
 )
-from services.article_service import ArticleService
-from services.auth_service import AuthService
-from services.comment_service import CommentService
-from services.jwt_service import JWTService
-from services.user_service import UserService
+from app.services.article_service import ArticleService
+from app.services.auth_service import AuthService
+from app.services.comment_service import CommentService
+from app.services.jwt_service import JWTService
+from app.services.user_service import UserService
 
 
 @lru_cache

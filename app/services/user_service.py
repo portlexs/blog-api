@@ -1,7 +1,7 @@
-from exceptions.user_exceptions import UserNotFoundError, UserAlreadyExistsError
-from models.user_model import User
-from repositories.user_repository import UserRepository
-from schemas.user_schemas import UserSearch, UserUpdate
+from app.exceptions.user_exceptions import UserNotFoundError, UserAlreadyExistsError
+from app.models.user_model import User
+from app.repositories.user_repository import UserRepository
+from app.schemas.user_schemas import UserSearch, UserUpdate
 
 
 class UserService:

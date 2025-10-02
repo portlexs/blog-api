@@ -1,10 +1,10 @@
 import uuid
 from typing import List, Optional
 
-from exceptions.article_exceptions import ArticleNotFoundError
-from models.article_model import Article
-from repositories.article_repository import ArticleRepository
-from schemas.article_schemas import ArticleCreate, ArticleUpdate
+from app.exceptions.article_exceptions import ArticleNotFoundError
+from app.models.article_model import Article
+from app.repositories.article_repository import ArticleRepository
+from app.schemas.article_schemas import ArticleCreate, ArticleUpdate
 
 
 class ArticleService:

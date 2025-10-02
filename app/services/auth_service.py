@@ -2,16 +2,16 @@ from typing import Tuple
 
 from fastapi.security import HTTPAuthorizationCredentials
 
-from core.security import verify_password
-from exceptions.credentials_exceptions import CredentialsException
-from exceptions.user_exceptions import (
+from app.core.security import verify_password
+from app.exceptions.credentials_exceptions import CredentialsException
+from app.exceptions.user_exceptions import (
     UserAlreadyExistsError,
     InvalidLoginOrPasswordError,
 )
-from models.user_model import User
-from repositories.user_repository import UserRepository
-from schemas.user_schemas import PublicUser, UserCreate, UserLogin
-from services.jwt_service import JWTService, TokenType
+from app.models.user_model import User
+from app.repositories.user_repository import UserRepository
+from app.schemas.user_schemas import PublicUser, UserCreate, UserLogin
+from app.services.jwt_service import JWTService, TokenType
 
 
 class AuthService:

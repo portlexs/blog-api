@@ -2,9 +2,9 @@ from typing import Dict
 
 from fastapi import APIRouter, FastAPI, status
 
-from routers.article_router import router as article_router
-from routers.comments_router import router as comments_router
-from routers.user_router import router as user_router
+from app.routers.article_router import router as article_router
+from app.routers.comments_router import router as comments_router
+from app.routers.user_router import router as user_router
 
 
 api_router = APIRouter(prefix="/api")

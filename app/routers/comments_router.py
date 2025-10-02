@@ -2,12 +2,12 @@ import uuid
 
 from fastapi import APIRouter, status
 
-from schemas.comment_schemas import (
+from app.schemas.comment_schemas import (
     CommentCreate,
     PublicComment,
     GetCommentsResponse,
 )
-from services.dependencies import CurrentUserDep, CommentServiceDep
+from app.services.dependencies import CurrentUserDep, CommentServiceDep
 
 
 router = APIRouter(prefix="/articles/{article_slug}/comments", tags=["comments"])

@@ -10,9 +10,9 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from config import settings
-from database.session import Base
-from models import user_model
+from app.config import settings
+from app.database.session import Base
+from app.models import user_model, article_model, comment_model
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

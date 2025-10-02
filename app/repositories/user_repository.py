@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user_model import User
-from schemas.user_schemas import UserUpdate
+from app.models.user_model import User
+from app.schemas.user_schemas import UserUpdate
 
 
 class UserRepository:

@@ -5,9 +5,9 @@ from typing import Optional
 from jose import jwt, JWTError
 from pydantic import ValidationError
 
-from enums.token_type import TokenType
-from schemas.token_schemas import TokenPayload
-from schemas.user_schemas import PublicUser
+from app.enums.token_type import TokenType
+from app.schemas.token_schemas import TokenPayload
+from app.schemas.user_schemas import PublicUser
 
 
 class JWTService:

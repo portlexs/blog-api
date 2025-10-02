@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, status
 
-from schemas.token_schemas import AuthTokens
-from schemas.user_schemas import (
+from app.schemas.token_schemas import AuthTokens
+from app.schemas.user_schemas import (
     PublicUser,
     UserCreate,
     UserLogin,
     UserSearch,
     UserUpdate,
 )
-from services.dependencies import AuthServiceDep, CurrentUserDep, UserServiceDep
+from app.services.dependencies import AuthServiceDep, CurrentUserDep, UserServiceDep
 
 
 router = APIRouter(prefix="/users", tags=["users"])
