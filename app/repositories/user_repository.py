@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +39,7 @@ class UserRepository:
     ) -> Optional[User]:
         query = select(User).where(or_(User.email == email, User.username == username))
         result = await self.session.execute(query)
-        return result.scalars().all()
+        return result.scalars().first()
 
     async def update_user(self, user: User, user_in: UserUpdate) -> User:
         user_data = user_in.model_dump(mode="json", exclude_unset=True)
