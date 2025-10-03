@@ -20,6 +20,6 @@ class UserNotFoundError(HTTPException):
 class InvalidLoginOrPasswordError(HTTPException):
     def __init__(self) -> None:
         super().__init__(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid login or password",
         )
