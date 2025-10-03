@@ -15,20 +15,14 @@ class UserService:
         return user
 
     async def update_user(self, user: User, user_in: UserUpdate) -> User:
-        if (
-            user_in.username is not None
-            and await self.user_repository.get_user_by_username(user_in.username)
-            is not None
-        ):
-            raise UserAlreadyExistsError()
-
-        if (
-            user_in.email is not None
-            and await self.user_repository.get_user_by_email(user_in.email) is not None
-        ):
-            raise UserAlreadyExistsError()
+        if user_in.email is not None or user_in.username is not None:
+            existing_user = await self.user_repository.get_user_by_email_or_username(
+                user_in.email, user_in.username
+            )
+            if existing_user is not None:
+                raise UserAlreadyExistsError()
 
         return await self.user_repository.update_user(user, user_in)
 
     async def delete_user(self, user: User) -> None:
-        await self.user_repository.update_user(user, {"is_active": False})
+        await self.user_repository.delete_user(user)
