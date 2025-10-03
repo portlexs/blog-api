@@ -35,14 +35,14 @@ class UserRepository:
         return result.scalars().one_or_none()
 
     async def get_user_by_email_or_username(
-        self, email: str, username: str
+        self, email: Optional[str], username: Optional[str]
     ) -> Optional[User]:
         query = select(User).where(or_(User.email == email, User.username == username))
         result = await self.session.execute(query)
-        return result.scalars().one_or_none()
+        return result.scalars().all()
 
     async def update_user(self, user: User, user_in: UserUpdate) -> User:
-        user_data = user_in.model_dump(exclude_unset=True)
+        user_data = user_in.model_dump(mode="json", exclude_unset=True)
 
         for key, value in user_data.items():
             setattr(user, key, value)
@@ -51,3 +51,9 @@ class UserRepository:
         await self.session.refresh(user)
 
         return user
+
+    async def delete_user(self, user: User) -> None:
+        setattr(user, "is_active", False)
+
+        await self.session.commit()
+        await self.session.refresh(user)
