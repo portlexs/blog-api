@@ -24,7 +24,3 @@ class User(Base):
     @validates("password")
     def validate_password(self, key, password: str) -> str:
         return hash_password(password)
-
-    @validates("avatar_url")
-    def validate_avatar_url(self, key, avatar_url: str) -> str:
-        return str(avatar_url)
