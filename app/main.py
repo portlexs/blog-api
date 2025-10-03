@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 # from .config import settings
-from .routers import api_router
+from .routers.dependencies import api_router
 
 
 app = FastAPI(title="Blog API")
