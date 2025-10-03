@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from app.enums.token_type import TokenType
 from app.schemas.token_schemas import TokenPayload
-from app.schemas.user_schemas import PublicUser
+from app.schemas.user_schemas import UserDataForToken
 
 
 class JWTService:
@@ -15,7 +15,7 @@ class JWTService:
         self.secret_key = secret_key
         self.algorithm = algorithm
 
-    def create_token(self, token_type: TokenType, user_data: PublicUser) -> str:
+    def create_token(self, token_type: TokenType, user_data: UserDataForToken) -> str:
         datetime_now = datetime.now(timezone.utc)
         exp = datetime_now + token_type.value
 

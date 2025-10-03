@@ -10,7 +10,7 @@ from app.exceptions.user_exceptions import (
 )
 from app.models.user_model import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user_schemas import PublicUser, UserCreate, UserLogin
+from app.schemas.user_schemas import UserCreate, UserDataForToken, UserLogin
 from app.services.jwt_service import JWTService, TokenType
 
 
@@ -30,7 +30,7 @@ class AuthService:
 
         user = User(**user_in.model_dump(mode="json"))
         new_user = await self.user_repository.create_user(user)
-        validated_user_data = PublicUser.model_validate(new_user)
+        validated_user_data = UserDataForToken.model_validate(new_user)
 
         tokens = self._create_tokens_pair(validated_user_data)
         return tokens
@@ -42,7 +42,7 @@ class AuthService:
         if user is None or not verify_password(user_in.password, user.password):
             raise InvalidLoginOrPasswordError()
 
-        user_data = PublicUser.model_validate(user)
+        user_data = UserDataForToken.model_validate(user)
 
         tokens = self._create_tokens_pair(user_data)
         return tokens
@@ -53,23 +53,23 @@ class AuthService:
 
         payload = self.jwt_service.decode_token(credentials.credentials)
         if payload is None or payload.token_type != "access":
-            raise CredentialsException(f"Invalid token")
+            raise CredentialsException("Invalid token")
 
         user = await self.user_repository.get_user_by_id(payload.user_data.id)
         if user is None:
             raise CredentialsException("User not found")
-        elif user.is_active is False:
+        elif not user.is_active:
             raise CredentialsException("User is not active")
 
         return user
 
     def refresh_tokens(self, current_user: User) -> Tuple[str, str]:
-        user_data = PublicUser.model_validate(current_user)
+        user_data = UserDataForToken.model_validate(current_user)
 
         tokens = self._create_tokens_pair(user_data)
         return tokens
 
-    def _create_tokens_pair(self, user_data: PublicUser) -> Tuple[str, str]:
+    def _create_tokens_pair(self, user_data: UserDataForToken) -> Tuple[str, str]:
         access_token = self.jwt_service.create_token(TokenType.ACCESS, user_data)
         refresh_token = self.jwt_service.create_token(TokenType.REFRESH, user_data)
         return access_token, refresh_token

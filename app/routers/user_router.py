@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, status
 
 from app.schemas.token_schemas import AuthTokens
 from app.schemas.user_schemas import (
-    PublicUser,
     UserCreate,
+    UserCurrent,
     UserLogin,
+    UserPublic,
     UserSearch,
     UserUpdate,
 )
@@ -16,25 +17,25 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get(
     path="/me",
-    response_model=PublicUser,
+    response_model=UserCurrent,
     status_code=status.HTTP_200_OK,
 )
-async def get_current_user(current_user: CurrentUserDep) -> PublicUser:
-    return PublicUser.model_validate(current_user)
+async def get_current_user(current_user: CurrentUserDep) -> UserCurrent:
+    return UserCurrent.model_validate(current_user)
 
 
 @router.get(
     path="/search",
-    response_model=PublicUser,
+    response_model=UserPublic,
     status_code=status.HTTP_200_OK,
 )
 async def search_user(
     _current_user: CurrentUserDep,
     user_service: UserServiceDep,
     user_in: UserSearch = Depends(),
-) -> PublicUser:
+) -> UserPublic:
     user = await user_service.get_user(user_in)
-    return PublicUser.model_validate(user)
+    return UserPublic.model_validate(user)
 
 
 @router.post(
@@ -61,14 +62,14 @@ async def login_user(auth_service: AuthServiceDep, user_in: UserLogin) -> AuthTo
 
 @router.put(
     path="/me/update",
-    response_model=PublicUser,
+    response_model=UserCurrent,
     status_code=status.HTTP_200_OK,
 )
 async def update_user(
     current_user: CurrentUserDep, user_service: UserServiceDep, user_in: UserUpdate
-) -> PublicUser:
+) -> UserCurrent:
     user = await user_service.update_user(current_user, user_in)
-    return PublicUser.model_validate(user)
+    return UserCurrent.model_validate(user)
 
 
 @router.delete(

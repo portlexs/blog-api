@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_serializer
 
-from app.schemas.user_schemas import PublicUser
+from app.schemas.user_schemas import UserDataForToken
 
 
 class TokenPayload(BaseModel):
@@ -11,7 +11,7 @@ class TokenPayload(BaseModel):
     token_type: str
     exp: datetime
     iat: datetime
-    user_data: PublicUser
+    user_data: UserDataForToken
 
     @field_serializer("exp")
     def serialize_exp(self, value: datetime) -> int:
