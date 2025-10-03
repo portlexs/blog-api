@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.config import settings
 from app.database.session import Base
-from app.models import user_model, article_model, comment_model
+from app.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -47,8 +47,9 @@ def run_migrations_offline() -> None:
     script output.
 
     """
+    url = config.get_main_option("sqlalchemy.url", settings.db.url)
     context.configure(
-        url=settings.db.url,
+        url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -70,12 +71,13 @@ async def run_async_migrations() -> None:
     and associate a connection with the context.
 
     """
+    url = config.get_main_option("sqlalchemy.url", settings.db.url)
 
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        url=settings.db.url,
+        url=url,
     )
 
     async with connectable.connect() as connection:
