@@ -16,7 +16,6 @@ from sqlalchemy.pool import NullPool
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from app import config as app_config
 from app.config import settings
 from app.database.dependencies import get_session
 from app.main import app

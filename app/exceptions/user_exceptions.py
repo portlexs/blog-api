@@ -23,3 +23,11 @@ class InvalidLoginOrPasswordError(HTTPException):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid login or password",
         )
+
+
+class UserNotActiveError(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not active",
+        )

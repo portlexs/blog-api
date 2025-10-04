@@ -6,7 +6,7 @@ from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, validates
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 
-from app.database.session import Base
+from ..database.session import Base
 
 
 class Article(Base):

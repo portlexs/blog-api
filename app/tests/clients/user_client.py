@@ -5,22 +5,8 @@ from httpx import AsyncClient, Response
 
 class UserClient:
     def __init__(self, client: AsyncClient) -> None:
-        self.base_url = "/api/users"
         self.client = client
-
-        self.base_register_data = {
-            "username": "test",
-            "email": "email@example.com",
-            "password": "password",
-            "biography": "test",
-            "avatar_url": "https://example.com/avatar.jpg",
-        }
-
-        self.required_register_data = {
-            "username": "test",
-            "email": "email@example.com",
-            "password": "password",
-        }
+        self.base_url = "/api/users"
 
     async def get_current_user(self, headers: Optional[Dict]) -> Response:
         return await self.client.get(f"{self.base_url}/me", headers=headers)
@@ -44,5 +30,6 @@ class UserClient:
             f"{self.base_url}/search", params=user_in, headers=headers
         )
 
-    async def refresh_token(self, headers: Optional[Dict]) -> Response:
-        return await self.client.post(f"{self.base_url}/me/refresh", headers=headers)
+    async def refresh_token(self, refresh_token: str) -> Response:
+        self.client.cookies.set("refresh_token", refresh_token)
+        return await self.client.post(f"{self.base_url}/me/refresh")

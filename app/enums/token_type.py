@@ -3,5 +3,5 @@ from enum import Enum
 
 
 class TokenType(Enum):
-    ACCESS = timedelta(minutes=30)
+    ACCESS = timedelta(minutes=10)
     REFRESH = timedelta(days=30)

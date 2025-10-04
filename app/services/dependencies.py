@@ -3,24 +3,25 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.core.security import SecurityDep
-from app.config import settings
-from app.models.user_model import User
-from app.repositories.dependencies import (
+from ..core.security import SecurityDep
+from ..config import settings
+from ..models.user_model import User
+from ..repositories.dependencies import (
     ArticleRepositoryDep,
     CommentRepositoryDep,
+    TokenRepositoryDep,
     UserRepositoryDep,
 )
-from app.services.article_service import ArticleService
-from app.services.auth_service import AuthService
-from app.services.comment_service import CommentService
-from app.services.jwt_service import JWTService
-from app.services.user_service import UserService
+from .article_service import ArticleService
+from .auth_service import AuthService
+from .comment_service import CommentService
+from .jwt_service import JWTService
+from .user_service import UserService
 
 
 @lru_cache
-def get_jwt_service() -> JWTService:
-    return JWTService(settings.jwt.secret_key, settings.jwt.algorithm)
+def get_jwt_service(token_repository: TokenRepositoryDep) -> JWTService:
+    return JWTService(settings.jwt.secret_key, settings.jwt.algorithm, token_repository)
 
 
 JWTServiceDep = Annotated[JWTService, Depends(get_jwt_service)]

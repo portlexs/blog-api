@@ -5,8 +5,8 @@ from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
-from app.core.security import hash_password
-from app.database.session import Base
+from ..core.security import hash_password
+from ..database.session import Base
 
 
 class User(Base):

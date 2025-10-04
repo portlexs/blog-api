@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Cookie, Depends, Response, status
 
-from app.schemas.token_schemas import AuthTokens
-from app.schemas.user_schemas import (
+from ..schemas.token_schemas import AuthTokens
+from ..schemas.user_schemas import (
     UserCreate,
     UserCurrent,
     UserLogin,
@@ -9,8 +9,8 @@ from app.schemas.user_schemas import (
     UserSearch,
     UserUpdate,
 )
-from app.services.dependencies import AuthServiceDep, CurrentUserDep, UserServiceDep
-
+from ..services.dependencies import AuthServiceDep, CurrentUserDep, UserServiceDep
+from ..utils.http_responses import set_refresh_token_cookie
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -44,10 +44,11 @@ async def search_user(
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    auth_service: AuthServiceDep, user_in: UserCreate
+    auth_service: AuthServiceDep, user_in: UserCreate, response: Response
 ) -> AuthTokens:
     access_token, refresh_token = await auth_service.register_user(user_in)
-    return AuthTokens(access_token=access_token, refresh_token=refresh_token)
+    set_refresh_token_cookie(response, refresh_token)
+    return AuthTokens(access_token=access_token)
 
 
 @router.post(
@@ -55,9 +56,12 @@ async def register_user(
     response_model=AuthTokens,
     status_code=status.HTTP_200_OK,
 )
-async def login_user(auth_service: AuthServiceDep, user_in: UserLogin) -> AuthTokens:
+async def login_user(
+    auth_service: AuthServiceDep, user_in: UserLogin, response: Response
+) -> AuthTokens:
     access_token, refresh_token = await auth_service.login_user(user_in)
-    return AuthTokens(access_token=access_token, refresh_token=refresh_token)
+    set_refresh_token_cookie(response, refresh_token)
+    return AuthTokens(access_token=access_token)
 
 
 @router.put(
@@ -88,7 +92,10 @@ async def delete_user(
     status_code=status.HTTP_200_OK,
 )
 async def refresh_tokens(
-    current_user: CurrentUserDep, auth_service: AuthServiceDep
+    auth_service: AuthServiceDep,
+    refresh_token: str | None = Cookie(default=None),
+    response: Response = None,
 ) -> AuthTokens:
-    access_token, refresh_token = auth_service.refresh_tokens(current_user)
-    return AuthTokens(access_token=access_token, refresh_token=refresh_token)
+    access_token, refresh_token = await auth_service.refresh_tokens(refresh_token)
+    set_refresh_token_cookie(response, refresh_token)
+    return AuthTokens(access_token=access_token)

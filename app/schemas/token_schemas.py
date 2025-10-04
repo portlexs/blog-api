@@ -24,4 +24,3 @@ class TokenPayload(BaseModel):
 
 class AuthTokens(BaseModel):
     access_token: str
-    refresh_token: str

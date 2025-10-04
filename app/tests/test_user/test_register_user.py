@@ -14,7 +14,7 @@ class TestRegisterUser:
 
         assert register_response.status_code == HTTPStatus.CREATED
         assert "access_token" in register_response.json()
-        assert "refresh_token" in register_response.json()
+        assert "refresh_token" in register_response.cookies
 
     async def test_register_user_with_existing_email(self, user_client: UserClient):
         register_response = await user_client.register_user(
