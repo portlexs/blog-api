@@ -19,6 +19,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from app.config import settings
 from app.database.dependencies import get_session
 from app.main import app
+from app.tests.clients.artcles_client import ArticleClient
 from app.tests.clients.user_client import UserClient
 
 
@@ -73,3 +74,8 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
 @pytest.fixture
 def user_client(client: AsyncClient) -> Generator[UserClient, None, None]:
     yield UserClient(client)
+
+
+@pytest.fixture
+def article_client(client: AsyncClient) -> Generator[ArticleClient, None, None]:
+    yield ArticleClient(client)
