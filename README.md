@@ -26,7 +26,7 @@
 - PostgreSQL (локально или в контейнере Docker)
 - Docker и Docker Compose (опционально, для удобного запуска)
 
-## Быстрый запуск приложения
+## Запуск приложения
 
 1. Клонируйте репозиторий:
 
@@ -34,67 +34,12 @@
 git clone https://github.com/portlexs/microservice-architecture
 ```
 
-2. Настрйте переменные окружения. Пример переменных окружения представлен в файле `.env.example`.
+2. Скопируйте переменные окружения в файл `.env` из файла `.env.example` и измените их при необходимости.
 
 3. Запустите сборку Docker образа:
 
 ```bash
-docker compose --profile default up --build -d
+docker compose -p blog --profile default up --build
 ```
 
-4. Обновите зависимости Alembic:
-
-```bash
-docker exec -it blog_api sh
-cd app/
-alembic upgrade head
-```
-
-5. Переходите по ссылке http://localhost:8000/docs
-
-## Локальный запуск приложения
-
-1. Клонируйте репозиторий:
-
-```bash
-git clone https://github.com/portlexs/microservice-architecture
-```
-
-2. Установите зависимости через Poetry:
-
-```bash
-poetry install
-```
-
-3. Обновите зависимости Alembic:
-
-```bash
-cd app/
-alembic upgrade head
-```
-
-4. Настрйте переменные окружения. Пример переменных окружения представлен в файле `.env.example`.
-
-5. Запустите образ базы данных:
-
-```bash
-docker compose --profile dev up --build -d
-```
-
-(или создайте базу данных локально в `pgAdmin`/`psql`)
-
-6. Запустите приложение:
-
-```bash
-python main.py # в папке app/
-```
-
-7. Переходите по ссылке http://localhost:8000/docs
-
-## Тестирование
-
-Для запуска тестов необходимо запустить следующую команду:
-
-```
-pytest tests/
-```
+4. Переходите по ссылке http://localhost:8000/docs

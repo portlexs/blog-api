@@ -23,10 +23,7 @@ from app.tests.clients.artcles_client import ArticleClient
 from app.tests.clients.user_client import UserClient
 
 
-engine_test = create_async_engine(
-    settings.test_db.url,
-    poolclass=NullPool,
-)
+engine_test = create_async_engine(settings.db.url, poolclass=NullPool)
 
 AsyncSessionTest = async_sessionmaker(
     engine_test, class_=AsyncSession, expire_on_commit=False
@@ -36,9 +33,7 @@ AsyncSessionTest = async_sessionmaker(
 @pytest.fixture(scope="session", autouse=True)
 def prepare_database():
     alembic_cfg = Config("alembic.ini")
-    alembic_cfg.set_main_option(
-        "sqlalchemy.url", settings.test_db.url.replace("%", "%%")
-    )
+    alembic_cfg.set_main_option("sqlalchemy.url", settings.db.url.replace("%", "%%"))
 
     command.upgrade(alembic_cfg, "head")
     yield

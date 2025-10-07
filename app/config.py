@@ -1,11 +1,7 @@
-from pathlib import Path
 from urllib.parse import quote_plus
 
 from pydantic import BaseModel, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class APISettings(BaseModel):
@@ -34,17 +30,15 @@ class DBSettings(BaseModel):
 
 class JWTSettings(BaseModel):
     secret_key: str
-    algorithm: str = "HS256"
+    algorithm: str
 
 
 class Settings(BaseSettings):
     api: APISettings
     db: DBSettings
     jwt: JWTSettings
-    test_db: DBSettings
 
     model_config = SettingsConfigDict(
-        env_file=str(BASE_DIR / ".env"),
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
     )
