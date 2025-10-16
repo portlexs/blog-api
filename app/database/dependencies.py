@@ -3,7 +3,7 @@ from typing import Annotated, AsyncGenerator
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.session import SessionLocal
+from ..database.session import SessionLocal
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:

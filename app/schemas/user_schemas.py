@@ -5,10 +5,9 @@ from typing import Optional, Union
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl
 
 
-class PublicUser(BaseModel):
+class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(..., default_factory=uuid.uuid4)
     username: str = Field(..., min_length=3, max_length=50)
     biography: Optional[str] = Field(default=None)
     avatar_url: Optional[HttpUrl] = Field(default=None)
@@ -16,12 +15,17 @@ class PublicUser(BaseModel):
     is_active: bool = Field(default=True)
 
 
+class UserCurrent(UserPublic):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(..., default_factory=uuid.uuid4)
+    email: EmailStr
+
+
 class UserCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
     password: str = Field(..., min_length=8)
-    biography: Optional[str] = Field(default=None)
-    avatar_url: Optional[HttpUrl] = Field(default=None)
 
 
 class UserLogin(BaseModel):
@@ -39,3 +43,9 @@ class UserUpdate(BaseModel):
     password: Optional[str] = Field(default=None, min_length=8)
     biography: Optional[str] = Field(default=None)
     avatar_url: Optional[HttpUrl] = Field(default=None)
+
+
+class UserDataForToken(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID

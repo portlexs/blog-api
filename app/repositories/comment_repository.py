@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.comment_model import Comment
+from ..models.comment_model import Comment
 
 
 class CommentRepository:

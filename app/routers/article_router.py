@@ -1,13 +1,12 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, status
 
-
-from schemas.article_schemas import (
+from ..schemas.article_schemas import (
     AllArticles,
     ArticleCreate,
     ArticleUpdate,
     PublicArticle,
 )
-from services.dependencies import ArticleServiceDep, CurrentUserDep
+from ..services.dependencies import ArticleServiceDep, CurrentUserDep
 
 
 router = APIRouter(prefix="/articles", tags=["articles"])

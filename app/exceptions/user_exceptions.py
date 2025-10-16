@@ -5,7 +5,7 @@ class UserAlreadyExistsError(HTTPException):
     def __init__(self) -> None:
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"User already exists",
+            detail="User already exists",
         )
 
 
@@ -13,13 +13,21 @@ class UserNotFoundError(HTTPException):
     def __init__(self) -> None:
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User not found",
+            detail="User not found",
         )
 
 
 class InvalidLoginOrPasswordError(HTTPException):
     def __init__(self) -> None:
         super().__init__(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid login or password",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid login or password",
+        )
+
+
+class UserNotActiveError(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not active",
         )

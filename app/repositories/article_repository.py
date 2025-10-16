@@ -4,8 +4,8 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.article_model import Article
-from schemas.article_schemas import ArticleUpdate
+from ..models.article_model import Article
+from ..schemas.article_schemas import ArticleUpdate
 
 
 class ArticleRepository:

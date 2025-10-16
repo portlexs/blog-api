@@ -1,6 +1,6 @@
 # Install Python
 ARG PYTHON_VERSION=3.10
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:${PYTHON_VERSION}-slim AS base
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -26,4 +26,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD ["python", "app/main.py"]
+CMD ["python", "-m", "app.main"]

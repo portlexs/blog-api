@@ -5,19 +5,19 @@
 Это приложение содержит RESTful API на языке Python с применением библиотеки FastAPI. С помощью API блога можно совершать различные операции над его содержимым - над пользователями, статьями и комментариями. Все операции храняться в базе данных PostgreSQL. Ниже приведен перечень того, к каким эндпоинтам можно обращаться:
 
 1. Проверка работоспособности приложения
-   ![alt text](docs_images/image-3.png)
+   ![alt text](docs/image-3.png)
 
 2. CRUD операции над пользователями. Обновление и получение пользователя доступно после авторизации и получения access токена.
 
-   ![alt text](docs_images/image-2.png)
+   ![alt text](docs/image-2.png)
 
 3. CRUD операции над статьями. Только авторизованный пользователь может с ними взаимодействовать.
 
-   ![alt text](docs_images/image.png)
+   ![alt text](docs/image.png)
 
 4. CRUD операции над комментариями. Доступ к комментариям осуществляется только для созданных статей и в случае авторизации пользователя.
 
-   ![alt text](docs_images/image-1.png)
+   ![alt text](docs/image-1.png)
 
 ## Требования для запуска
 
@@ -26,7 +26,7 @@
 - PostgreSQL (локально или в контейнере Docker)
 - Docker и Docker Compose (опционально, для удобного запуска)
 
-## Быстрый запуск приложения
+## Запуск приложения
 
 1. Клонируйте репозиторий:
 
@@ -34,67 +34,12 @@
 git clone https://github.com/portlexs/microservice-architecture
 ```
 
-2. Настрйте переменные окружения. Пример переменных окружения представлен в файле `.env.example`.
+2. Скопируйте переменные окружения в файл `.env` из файла `.env.example` и измените их при необходимости.
 
 3. Запустите сборку Docker образа:
 
 ```bash
-docker compose --profile default up --build -d
+docker compose -p blog --profile default up --build
 ```
 
-4. Обновите зависимости Alembic:
-
-```bash
-docker exec -it blog_api sh
-cd app/
-alembic upgrade head
-```
-
-5. Переходите по ссылке http://localhost:8000/docs
-
-## Локальный запуск приложения
-
-1. Клонируйте репозиторий:
-
-```bash
-git clone https://github.com/portlexs/microservice-architecture
-```
-
-2. Установите зависимости через Poetry:
-
-```bash
-poetry install
-```
-
-3. Обновите зависимости Alembic:
-
-```bash
-cd app/
-alembic upgrade head
-```
-
-4. Настрйте переменные окружения. Пример переменных окружения представлен в файле `.env.example`.
-
-5. Запустите образ базы данных:
-
-```bash
-docker compose --profile dev up --build -d
-```
-
-(или создайте базу данных локально в `pgAdmin`/`psql`)
-
-6. Запустите приложение:
-
-```bash
-python main.py # в папке app/
-```
-
-7. Переходите по ссылке http://localhost:8000/docs
-
-## Тестирование
-
-Для запуска тестов необходимо запустить следующую команду:
-
-```
-pytest tests/
-```
+4. Переходите по ссылке http://localhost:8000/docs

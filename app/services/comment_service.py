@@ -1,11 +1,11 @@
 import uuid
 from typing import List
 
-from exceptions.comment_exceptions import CommentNotFoundError
-from models.comment_model import Comment
-from repositories.comment_repository import CommentRepository
-from schemas.comment_schemas import CommentCreate
-from services.article_service import ArticleService
+from ..exceptions.comment_exceptions import CommentNotFoundError
+from ..models.comment_model import Comment
+from ..repositories.comment_repository import CommentRepository
+from ..schemas.comment_schemas import CommentCreate
+from ..services.article_service import ArticleService
 
 
 class CommentService:
