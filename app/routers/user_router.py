@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Cookie, Depends, Response, status
+from fastapi import status, APIRouter, Cookie, Depends
 
 from ..schemas.token_schemas import AuthTokens
 from ..schemas.user_schemas import (
@@ -10,7 +10,7 @@ from ..schemas.user_schemas import (
     UserUpdate,
 )
 from ..services.dependencies import AuthServiceDep, CurrentUserDep, UserServiceDep
-from ..utils.http_responses import set_refresh_token_cookie
+from ..utils.responses import create_auth_response
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -43,11 +43,10 @@ async def search_user(
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    auth_service: AuthServiceDep, user_in: UserCreate, response: Response
+    auth_service: AuthServiceDep, user_in: UserCreate
 ) -> AuthTokens:
     access_token, refresh_token = await auth_service.register_user(user_in)
-    set_refresh_token_cookie(response, refresh_token)
-    return AuthTokens(access_token=access_token)
+    return create_auth_response(access_token, refresh_token, status.HTTP_201_CREATED)
 
 
 @router.post(
@@ -55,12 +54,9 @@ async def register_user(
     response_model=AuthTokens,
     status_code=status.HTTP_200_OK,
 )
-async def login_user(
-    auth_service: AuthServiceDep, user_in: UserLogin, response: Response
-) -> AuthTokens:
+async def login_user(auth_service: AuthServiceDep, user_in: UserLogin) -> AuthTokens:
     access_token, refresh_token = await auth_service.login_user(user_in)
-    set_refresh_token_cookie(response, refresh_token)
-    return AuthTokens(access_token=access_token)
+    return create_auth_response(access_token, refresh_token, status.HTTP_200_OK)
 
 
 @router.put(
@@ -91,10 +87,7 @@ async def delete_user(
     status_code=status.HTTP_200_OK,
 )
 async def refresh_tokens(
-    auth_service: AuthServiceDep,
-    refresh_token: str | None = Cookie(default=None),
-    response: Response = None,
+    auth_service: AuthServiceDep, refresh_token: str | None = Cookie(default=None)
 ) -> AuthTokens:
     access_token, refresh_token = await auth_service.refresh_tokens(refresh_token)
-    set_refresh_token_cookie(response, refresh_token)
-    return AuthTokens(access_token=access_token)
+    return create_auth_response(access_token, refresh_token, status.HTTP_200_OK)
