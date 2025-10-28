@@ -16,14 +16,14 @@ from sqlalchemy.pool import NullPool
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from app.config import settings
-from app.database.dependencies import get_session
+from app.database.session import get_session
 from app.main import app
 from app.tests.clients.artcles_client import ArticleClient
+from app.tests.clients.comment_client import CommentClient
 from app.tests.clients.user_client import UserClient
 
-
-engine_test = create_async_engine(settings.db.url, poolclass=NullPool)
+db_url = f"postgresql+asyncpg://postgres:password@localhost:5433/test_db"
+engine_test = create_async_engine(db_url, poolclass=NullPool)
 
 AsyncSessionTest = async_sessionmaker(
     engine_test, class_=AsyncSession, expire_on_commit=False
@@ -33,7 +33,7 @@ AsyncSessionTest = async_sessionmaker(
 @pytest.fixture(scope="session", autouse=True)
 def prepare_database():
     alembic_cfg = Config("alembic.ini")
-    alembic_cfg.set_main_option("sqlalchemy.url", settings.db.url.replace("%", "%%"))
+    alembic_cfg.set_main_option("sqlalchemy.url", db_url)
 
     command.upgrade(alembic_cfg, "head")
     yield
@@ -74,3 +74,8 @@ def user_client(client: AsyncClient) -> Generator[UserClient, None, None]:
 @pytest.fixture
 def article_client(client: AsyncClient) -> Generator[ArticleClient, None, None]:
     yield ArticleClient(client)
+
+
+@pytest.fixture
+def comment_client(client: AsyncClient) -> Generator[CommentClient, None, None]:
+    yield CommentClient(client)
