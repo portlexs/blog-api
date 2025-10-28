@@ -6,7 +6,7 @@ from .article_service import ArticleService
 from .auth_service import AuthService
 from .comment_service import CommentService
 from ..core.security import SecurityDep
-from ..config import get_settings
+from ..config import settings
 from .jwt_service import JWTService
 from ..models.user_model import User
 from ..repositories.dependencies import (
@@ -19,7 +19,6 @@ from .user_service import UserService
 
 
 def get_jwt_service(token_repository: TokenRepositoryDep) -> JWTService:
-    settings = get_settings()
     return JWTService(settings.jwt.secret_key, settings.jwt.algorithm, token_repository)
 
 

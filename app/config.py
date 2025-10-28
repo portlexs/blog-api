@@ -1,4 +1,3 @@
-from functools import lru_cache
 from urllib.parse import quote_plus
 
 from pydantic import BaseModel, computed_field
@@ -11,9 +10,9 @@ class APISettings(BaseModel):
 
 
 class DBSettings(BaseModel):
-    name: str = "db"
+    name: str = "test_db"
     host: str = "localhost"
-    port: int = 5432
+    port: int = 5433
     user: str = "postgres"
     password: str = "password"
 
@@ -45,6 +44,4 @@ class Settings(BaseSettings):
     )
 
 
-@lru_cache(maxsize=1)
-def get_settings() -> Settings:
-    return Settings()
+settings = Settings()

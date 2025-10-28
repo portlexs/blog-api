@@ -1,12 +1,13 @@
 from typing import Annotated, AsyncGenerator
 
-from fastapi import Depends, Request
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .engine import SessionLocal
 
-async def get_session(request: Request) -> AsyncGenerator[AsyncSession, None]:
-    session_factory = request.app.state.session_factory
-    async with session_factory() as session:
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with SessionLocal() as session:
         yield session
 
 
