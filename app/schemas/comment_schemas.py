@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -23,4 +23,4 @@ class GetCommentsResponse(BaseModel):
 
 
 class CommentUpdate(BaseModel):
-    body: str = Field(..., min_length=1)
+    body: Optional[str] = Field(default=None, min_length=1)
