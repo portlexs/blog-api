@@ -1,10 +1,13 @@
-from functools import lru_cache
 from typing import Annotated
 
 from fastapi import Depends
 
+from .article_service import ArticleService
+from .auth_service import AuthService
+from .comment_service import CommentService
 from ..core.security import SecurityDep
-from ..config import settings
+from ..config import get_settings
+from .jwt_service import JWTService
 from ..models.user_model import User
 from ..repositories.dependencies import (
     ArticleRepositoryDep,
@@ -12,15 +15,11 @@ from ..repositories.dependencies import (
     TokenRepositoryDep,
     UserRepositoryDep,
 )
-from .article_service import ArticleService
-from .auth_service import AuthService
-from .comment_service import CommentService
-from .jwt_service import JWTService
 from .user_service import UserService
 
 
-@lru_cache
 def get_jwt_service(token_repository: TokenRepositoryDep) -> JWTService:
+    settings = get_settings()
     return JWTService(settings.jwt.secret_key, settings.jwt.algorithm, token_repository)
 
 
