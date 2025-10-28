@@ -80,4 +80,4 @@ class TestLoginUser:
             {"login": "email@example.com", "password": "password"}
         )
 
-        assert login_response.status_code == HTTPStatus.UNAUTHORIZED
+        assert login_response.status_code == HTTPStatus.FORBIDDEN

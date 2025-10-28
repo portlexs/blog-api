@@ -27,7 +27,7 @@ class TestRegisterUser:
             {"username": "test2", "email": "email@example.com", "password": "password2"}
         )
 
-        assert register_response.status_code == HTTPStatus.BAD_REQUEST
+        assert register_response.status_code == HTTPStatus.CONFLICT
 
     async def test_register_user_with_existing_username(self, user_client: UserClient):
         register_response = await user_client.register_user(
@@ -40,7 +40,7 @@ class TestRegisterUser:
             {"username": "test", "email": "email2@example.com", "password": "password2"}
         )
 
-        assert register_response.status_code == HTTPStatus.BAD_REQUEST
+        assert register_response.status_code == HTTPStatus.CONFLICT
 
     async def test_register_user_with_existing_username_and_email(
         self, user_client: UserClient
@@ -69,7 +69,7 @@ class TestRegisterUser:
             }
         )
 
-        assert register_response.status_code == HTTPStatus.BAD_REQUEST
+        assert register_response.status_code == HTTPStatus.CONFLICT
 
     async def test_register_user_with_invalid_email(self, user_client: UserClient):
         register_response = await user_client.register_user(
