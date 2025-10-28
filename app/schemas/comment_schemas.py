@@ -20,3 +20,7 @@ class PublicComment(CommentCreate):
 
 class GetCommentsResponse(BaseModel):
     comments: List[PublicComment]
+
+
+class CommentUpdate(BaseModel):
+    body: str = Field(..., min_length=1)
