@@ -28,7 +28,7 @@ class TestSearchUser:
             {"username": "test"}, headers=None
         )
 
-        assert search_response.status_code == HTTPStatus.UNAUTHORIZED
+        assert search_response.status_code == HTTPStatus.OK
 
     async def test_search_user_not_found(self, user_client: UserClient) -> None:
         register_response = await user_client.register_user(

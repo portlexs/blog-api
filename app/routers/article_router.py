@@ -31,7 +31,6 @@ async def get_all_user_articles(
 )
 async def get_article(
     article_slug: str,
-    _current_user: CurrentUserDep,
     article_service: ArticleServiceDep,
 ) -> PublicArticle:
     article = await article_service.get_article(article_slug)

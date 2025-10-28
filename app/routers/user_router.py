@@ -30,7 +30,6 @@ async def get_current_user(current_user: CurrentUserDep) -> UserCurrent:
     status_code=status.HTTP_200_OK,
 )
 async def search_user(
-    _current_user: CurrentUserDep,
     user_service: UserServiceDep,
     user_in: UserSearch = Depends(),
 ) -> UserPublic:
