@@ -1,18 +1,13 @@
-from sqlalchemy.orm import DeclarativeBase, declared_attr
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from typing import Annotated, AsyncGenerator
+
+from fastapi import Depends, Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-from ..config import settings
+async def get_session(request: Request) -> AsyncGenerator[AsyncSession, None]:
+    session_factory = request.app.state.session_factory
+    async with session_factory() as session:
+        yield session
 
 
-class Base(DeclarativeBase):
-    @declared_attr.directive
-    def __tablename__(cls) -> str:
-        return cls.__name__.lower() + "s"
-
-
-engine = create_async_engine(settings.db.url, echo=True)
-
-SessionLocal = async_sessionmaker(
-    bind=engine, autoflush=False, autocommit=False, expire_on_commit=False
-)
+SessionDep = Annotated[AsyncSession, Depends(get_session)]

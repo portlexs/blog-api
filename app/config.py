@@ -1,3 +1,4 @@
+from functools import lru_cache
 from urllib.parse import quote_plus
 
 from pydantic import BaseModel, computed_field
@@ -44,4 +45,6 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    return Settings()
