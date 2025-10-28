@@ -36,19 +36,6 @@ services:
     restart: "no"
     profiles: ["default"]
 
-  # --- Test Migration Service ---
-  test_migrate:
-    build: .
-    container_name: test_blog_migrate
-    command: bash -c "sleep 5 && alembic upgrade head"
-    env_file:
-      - .test.env
-    depends_on:
-      test_db:
-        condition: service_healthy
-    restart: "no"
-    profiles: ["dev"]
-
   # --- Database Service ---
   db:
     image: postgres:17
@@ -72,36 +59,22 @@ services:
   # --- Test Database Service ---
   test_db:
     image: postgres:17
-    container_name: test_blog_db
+    container_name: blog_test_db
     restart: always
-    env_file:
-      - .test.env
     environment:
-      POSTGRES_DB: ${DB__NAME}
-      POSTGRES_USER: ${DB__USER}
-      POSTGRES_PASSWORD: ${DB__PASSWORD}
+      POSTGRES_DB: test_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     volumes:
       - test_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${DB__USER} -d $${DB__NAME}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d test_db"]
+      interval: 5s
       timeout: 5s
-      retries: 2
-    profiles: ["dev"]
-
-  test_runner:
-    build: .
-    container_name: blog_test_runner
-    command: pytest
-    env_file:
-      - .test.env
-    depends_on:
-      test_db:
-        condition: service_healthy
-      test_migrate:
-        condition: service_completed_successfully
-    restart: "no"
-    profiles: ["dev"]
+      retries: 5
+    profiles: ["test"]
 
 volumes:
   postgres_data:
