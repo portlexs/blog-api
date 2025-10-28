@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -20,3 +20,7 @@ class PublicComment(CommentCreate):
 
 class GetCommentsResponse(BaseModel):
     comments: List[PublicComment]
+
+
+class CommentUpdate(BaseModel):
+    body: Optional[str] = Field(default=None, min_length=1)

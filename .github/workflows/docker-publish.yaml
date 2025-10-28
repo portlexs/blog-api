@@ -1,4 +1,4 @@
-name: Docker Publish
+name: CI & Docker Publish
 
 on:
   push:
@@ -11,8 +11,45 @@ on:
       - main
 
 jobs:
-  docker:
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: "2.2.1"
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Start test database
+        run: docker compose --profile test up -d
+
+      - name: Wait for database to be ready
+        run: sleep 10
+
+      - name: Run tests
+        run: poetry run pytest
+
+      - name: Stop test database
+        if: always()
+        run: docker compose --profile test down
+
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     permissions:
       contents: read

@@ -21,7 +21,7 @@ class PublicArticle(ArticleCreate):
     created_at: datetime
 
 
-class AllArticles(BaseModel):
+class AllUserArticles(BaseModel):
     articles: List[PublicArticle]
 
 

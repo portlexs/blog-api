@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from ..core.security import hash_password
-from ..database.session import Base
+from ..database.base import Base
 
 
 class User(Base):

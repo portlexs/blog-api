@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 
 from ..schemas.article_schemas import (
-    AllArticles,
+    AllUserArticles,
     ArticleCreate,
     ArticleUpdate,
     PublicArticle,
@@ -14,15 +14,14 @@ router = APIRouter(prefix="/articles", tags=["articles"])
 
 @router.get(
     path="/",
-    response_model=AllArticles,
+    response_model=AllUserArticles,
     status_code=status.HTTP_200_OK,
 )
-async def get_articles(
-    current_user: CurrentUserDep,
-    article_service: ArticleServiceDep,
-) -> AllArticles:
-    articles = await article_service.get_all_articles(current_user.id)
-    return AllArticles(articles=articles)
+async def get_all_user_articles(
+    current_user: CurrentUserDep, article_service: ArticleServiceDep
+) -> AllUserArticles:
+    articles = await article_service.get_all_user_articles(current_user.id)
+    return AllUserArticles(articles=articles)
 
 
 @router.get(
@@ -32,10 +31,9 @@ async def get_articles(
 )
 async def get_article(
     article_slug: str,
-    current_user: CurrentUserDep,
     article_service: ArticleServiceDep,
 ) -> PublicArticle:
-    article = await article_service.get_article(article_slug, current_user.id)
+    article = await article_service.get_article(article_slug)
     return PublicArticle.model_validate(article)
 
 

@@ -26,6 +26,12 @@ class TestUpdateUser:
 
         assert update_user_response.status_code == HTTPStatus.OK
 
+        login_response = await user_client.login_user(
+            {"login": "new_test", "password": "new_password"}
+        )
+
+        assert login_response.status_code == HTTPStatus.OK
+
     async def test_update_user_with_existing_email(
         self, user_client: UserClient
     ) -> None:
@@ -39,7 +45,7 @@ class TestUpdateUser:
             headers={"Authorization": f"Bearer {access_token}"},
         )
 
-        assert update_user_response.status_code == HTTPStatus.BAD_REQUEST
+        assert update_user_response.status_code == HTTPStatus.CONFLICT
 
     async def test_update_user_with_existing_username(
         self, user_client: UserClient
@@ -54,7 +60,7 @@ class TestUpdateUser:
             headers={"Authorization": f"Bearer {access_token}"},
         )
 
-        assert update_user_response.status_code == HTTPStatus.BAD_REQUEST
+        assert update_user_response.status_code == HTTPStatus.CONFLICT
 
     async def test_update_user_with_existig_username_and_email(
         self, user_client: UserClient
@@ -73,4 +79,4 @@ class TestUpdateUser:
             headers={"Authorization": f"Bearer {access_token}"},
         )
 
-        assert update_user_response.status_code == HTTPStatus.BAD_REQUEST
+        assert update_user_response.status_code == HTTPStatus.CONFLICT

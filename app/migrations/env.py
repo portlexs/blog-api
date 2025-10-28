@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.config import settings
-from app.database.session import Base
+from app.database.base import Base
 from app.models import article_model, comment_model, token_model, user_model
 
 # this is the Alembic Config object, which provides
@@ -48,6 +48,7 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url", settings.db.url)
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -67,7 +68,8 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    """In this scenario we need to create an Engine
+    """
+    In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """

@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 security = HTTPBearer(auto_error=False)
 SecurityDep = Annotated[Optional[HTTPAuthorizationCredentials], Depends(security)]
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:

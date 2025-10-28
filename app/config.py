@@ -5,16 +5,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class APISettings(BaseModel):
-    host: str
-    port: int
+    host: str = "0.0.0.0"
+    port: int = 8000
 
 
 class DBSettings(BaseModel):
-    name: str
-    host: str
-    port: int
-    user: str
-    password: str
+    name: str = "test_db"
+    host: str = "localhost"
+    port: int = 5433
+    user: str = "postgres"
+    password: str = "password"
 
     @computed_field
     def encoded_password(self) -> str:
@@ -29,14 +29,14 @@ class DBSettings(BaseModel):
 
 
 class JWTSettings(BaseModel):
-    secret_key: str
-    algorithm: str
+    secret_key: str = "secret"
+    algorithm: str = "HS256"
 
 
 class Settings(BaseSettings):
-    api: APISettings
-    db: DBSettings
-    jwt: JWTSettings
+    api: APISettings = APISettings()
+    db: DBSettings = DBSettings()
+    jwt: JWTSettings = JWTSettings()
 
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",

@@ -42,3 +42,32 @@ class TestCreateArticle:
         )
 
         assert create_article_response.status_code == HTTPStatus.CREATED
+
+    async def test_create_article_unauthorized(
+        self, article_client: ArticleClient
+    ) -> None:
+        create_article_response = await article_client.create_article(
+            {"title": "test", "body": "test", "description": "test"},
+            headers={"Authorization": f"Bearer None"},
+        )
+
+        assert create_article_response.status_code == HTTPStatus.UNAUTHORIZED
+
+    async def test_create_article_already_exists(
+        self, user_client: UserClient, article_client: ArticleClient
+    ) -> None:
+        register_response = await user_client.register_user(
+            {"username": "test", "email": "email@example.com", "password": "password"}
+        )
+        access_token = register_response.json()["access_token"]
+
+        await article_client.create_article(
+            {"title": "test", "body": "test", "description": "test"},
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+        create_article_response = await article_client.create_article(
+            {"title": "test", "body": "test", "description": "test"},
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        assert create_article_response.status_code == HTTPStatus.CREATED

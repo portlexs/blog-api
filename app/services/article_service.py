@@ -1,7 +1,12 @@
 import uuid
 from typing import List, Optional
 
-from ..exceptions.article_exceptions import ArticleNotFoundError
+from slugify import slugify
+
+from ..exceptions.article_exceptions import (
+    ArticleAlreadyExistsError,
+    ArticleNotFoundError,
+)
 from ..models.article_model import Article
 from ..repositories.article_repository import ArticleRepository
 from ..schemas.article_schemas import ArticleCreate, ArticleUpdate
@@ -11,8 +16,8 @@ class ArticleService:
     def __init__(self, article_repository: ArticleRepository) -> None:
         self.article_repository = article_repository
 
-    async def get_all_articles(self, user_id: uuid.UUID) -> List[Article]:
-        return await self.article_repository.get_all_articles(user_id=user_id)
+    async def get_all_user_articles(self, user_id: uuid.UUID) -> List[Article]:
+        return await self.article_repository.get_all_user_articles(user_id=user_id)
 
     async def get_article(
         self, article_slug: str, user_id: Optional[uuid.UUID] = None
@@ -28,13 +33,24 @@ class ArticleService:
         article_data = article_in.model_dump(exclude_unset=True)
 
         article = Article(**article_data, user_id=user_id)
-        new_article = await self.article_repository.create_article(article)
 
+        existing_article = await self.article_repository.get_article(article.slug)
+        if existing_article:
+            article.slug = f"{article.slug}-{uuid.uuid4().hex[:8]}"
+
+        new_article = await self.article_repository.create_article(article)
         return new_article
 
     async def update_article(
         self, article_slug: str, article_in: ArticleUpdate, user_id: uuid.UUID
     ) -> Article:
+        if article_in.title:
+            existing_article = await self.article_repository.get_article(
+                slugify(article_in.title)
+            )
+            if existing_article:
+                article_in.title = f"{article_in.title}-{uuid.uuid4().hex[:8]}"
+
         article = await self.get_article(article_slug, user_id)
 
         updated_article = await self.article_repository.update_article(
