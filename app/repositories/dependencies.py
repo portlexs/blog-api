@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from ..database.dependencies import SessionDep
+from ..database.session import SessionDep
 from .article_repository import ArticleRepository
 from .comment_repository import CommentRepository
 from .token_repository import TokenRepository
