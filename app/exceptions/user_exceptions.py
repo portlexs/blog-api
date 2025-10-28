@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 class UserAlreadyExistsError(HTTPException):
     def __init__(self) -> None:
         super().__init__(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail="User already exists",
         )
 
@@ -28,6 +28,6 @@ class InvalidLoginOrPasswordError(HTTPException):
 class UserNotActiveError(HTTPException):
     def __init__(self) -> None:
         super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="User is not active",
         )
