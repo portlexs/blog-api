@@ -21,9 +21,11 @@ class CommentService:
         return comments
 
     async def get_comment(
-        self, article_id: uuid.UUID, comment_id: uuid.UUID
+        self, article_id: uuid.UUID, comment_id: uuid.UUID, user_id: uuid.UUID
     ) -> Comment:
-        comment = await self.comment_repository.get_comment(article_id, comment_id)
+        comment = await self.comment_repository.get_comment(
+            article_id, comment_id, user_id
+        )
         if comment is None:
             raise CommentNotFoundError()
         return comment
@@ -35,12 +37,29 @@ class CommentService:
 
         comment_data = comment_in.model_dump(mode="json")
         comment = Comment(**comment_data, user_id=user_id, article_id=article.id)
-
         comment = await self.comment_repository.create_comment(comment)
+
         return comment
 
-    async def delete_comment(self, article_slug: str, comment_id: uuid.UUID) -> None:
+    async def update_comment(
+        self,
+        article_slug: str,
+        comment_id: uuid.UUID,
+        comment_in: CommentCreate,
+        user_id: uuid.UUID,
+    ) -> Comment:
         article = await self.article_service.get_article(article_slug)
-        comment = await self.get_comment(article_id=article.id, comment_id=comment_id)
+        old_comment = await self.get_comment(article.id, comment_id, user_id)
+
+        updated_comment = await self.comment_repository.update_comment(
+            old_comment, comment_in
+        )
+        return updated_comment
+
+    async def delete_comment(
+        self, article_slug: str, comment_id: uuid.UUID, user_id: uuid.UUID
+    ) -> None:
+        article = await self.article_service.get_article(article_slug)
+        comment = await self.get_comment(article.id, comment_id, user_id)
 
         await self.comment_repository.delete_comment(comment)
