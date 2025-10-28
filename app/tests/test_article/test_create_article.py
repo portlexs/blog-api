@@ -70,4 +70,4 @@ class TestCreateArticle:
             {"title": "test", "body": "test", "description": "test"},
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        assert create_article_response.status_code == HTTPStatus.CONFLICT
+        assert create_article_response.status_code == HTTPStatus.CREATED

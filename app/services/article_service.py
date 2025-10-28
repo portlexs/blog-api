@@ -36,7 +36,7 @@ class ArticleService:
 
         existing_article = await self.article_repository.get_article(article.slug)
         if existing_article:
-            raise ArticleAlreadyExistsError()
+            article.slug = f"{article.slug}-{uuid.uuid4().hex[:8]}"
 
         new_article = await self.article_repository.create_article(article)
         return new_article
@@ -49,7 +49,7 @@ class ArticleService:
                 slugify(article_in.title)
             )
             if existing_article:
-                raise ArticleAlreadyExistsError()
+                article_in.title = f"{article_in.title}-{uuid.uuid4().hex[:8]}"
 
         article = await self.get_article(article_slug, user_id)
 

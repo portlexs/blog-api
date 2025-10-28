@@ -147,4 +147,4 @@ class TestUpdateArticle:
             headers={"Authorization": f"Bearer {access_token}"},
         )
 
-        assert update_article_response.status_code == HTTPStatus.CONFLICT
+        assert update_article_response.status_code == HTTPStatus.OK
