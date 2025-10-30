@@ -4,14 +4,12 @@ from fastapi import APIRouter, status
 
 from .article_router import router as article_router
 from .comments_router import router as comments_router
-from .user_router import router as user_router
 
 
 api_router = APIRouter(prefix="/api")
 
 api_router.include_router(article_router)
 api_router.include_router(comments_router)
-api_router.include_router(user_router)
 
 
 @api_router.get(

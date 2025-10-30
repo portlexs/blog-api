@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_serializer
 
-from ..schemas.user_schemas import UserDataForToken
+from .user_schemas import UserDataForToken
 
 
 class TokenPayload(BaseModel):

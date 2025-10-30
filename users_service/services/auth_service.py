@@ -13,7 +13,7 @@ from ..exceptions.user_exceptions import (
 from ..models.user_model import User
 from ..repositories.user_repository import UserRepository
 from ..schemas.user_schemas import UserCreate, UserDataForToken, UserLogin
-from ..services.jwt_service import JWTService
+from .jwt_service import JWTService
 
 
 class AuthService:
