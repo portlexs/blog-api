@@ -4,6 +4,11 @@ from pydantic import BaseModel, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class APISettings(BaseModel):
+    host: str = "0.0.0.0"
+    port: int = 8000
+
+
 class DBSettings(BaseModel):
     name: str = "test_db"
     host: str = "localhost"
@@ -29,6 +34,7 @@ class JWTSettings(BaseModel):
 
 
 class Settings(BaseSettings):
+    api: APISettings = APISettings()
     db: DBSettings = DBSettings()
     jwt: JWTSettings = JWTSettings()
 

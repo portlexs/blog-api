@@ -12,7 +12,8 @@ from ..schemas.user_schemas import (
 from ..services.dependencies import AuthServiceDep, CurrentUserDep, UserServiceDep
 from ..utils.responses import create_auth_response
 
-router = APIRouter(prefix="/users", tags=["users"])
+
+router = APIRouter(prefix="api/users", tags=["users"])
 
 
 @router.get(
