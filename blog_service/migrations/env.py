@@ -8,11 +8,11 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from app.config import settings
-from app.database.base import Base
-from app.models import article_model, comment_model
+from blog_service.config import settings
+from blog_service.database.base import Base
+from blog_service.models import article_model, comment_model
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
