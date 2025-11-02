@@ -3,11 +3,11 @@ import uvicorn
 from fastapi import FastAPI
 
 from .config import settings
-from .routers.user_router import router
+from .routers.dependencies import api_router
 
 
 app = FastAPI(title="Blog API")
-app.include_router(router)
+app.include_router(api_router)
 
 
 if __name__ == "__main__":

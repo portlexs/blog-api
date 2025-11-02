@@ -13,7 +13,7 @@ from ..services.dependencies import AuthServiceDep, CurrentUserDep, UserServiceD
 from ..utils.responses import create_auth_response
 
 
-router = APIRouter(prefix="api/users", tags=["users"])
+router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get(
