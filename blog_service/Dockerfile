@@ -1,8 +1,6 @@
-# Install Python
 ARG PYTHON_VERSION=3.10
 FROM python:${PYTHON_VERSION}-slim AS base
 
-# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -11,19 +9,17 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Install Poetry
 RUN pip install --no-cache-dir poetry
 
-COPY pyproject.toml poetry.lock  ./
+COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create false \
     && poetry install --no-root --no-interaction --no-ansi
 
-# Copy the source code into the container.
-COPY . .
+COPY alembic.ini .
 
-# Expose the port that the application listens on.
+COPY ./app /app/app
+
 EXPOSE 8000
 
-# Run the application.
 CMD ["python", "-m", "app.main"]

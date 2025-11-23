@@ -1,0 +1,69 @@
+services:
+  blog_service:
+    container_name: blog_service
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      blog_db:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+      - ./alembic.ini:/app/alembic.ini
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail --silent --show-error http://${API__HOST}:${API__PORT}/api/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+      - blog
+
+  blog_db:
+    container_name: blog_db
+    image: postgres:17-alpine
+    restart: always
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB__NAME}
+      POSTGRES_USER: ${DB__USER}
+      POSTGRES_PASSWORD: ${DB__PASSWORD}
+    volumes:
+      - blog_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB__USER} -d $${DB__NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+    networks:
+      - default
+
+  blog_migrations:
+    container_name: blog_migrations
+    build: .
+    command: alembic upgrade head
+    env_file:
+      - .env
+    depends_on:
+      blog_db:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - default
+
+volumes:
+  blog_db_data:
+
+networks:
+  blog:
+    external: true
+    name: blog_network
