@@ -6,7 +6,7 @@ from .config import settings
 from .routers.dependencies import api_router
 
 
-app = FastAPI(title="Blog API", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI(title="Blog API", docs_url=None, redoc_url=None,openapi_url="/api/openapi.json")
 app.include_router(api_router)
 
 

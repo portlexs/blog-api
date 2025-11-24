@@ -21,9 +21,7 @@ git clone https://github.com/portlexs/microservice-architecture
 3. Запустите сборку Docker образа:
 
 ```bash
-docker compose -p blog_api up --build
+docker compose -p blog_api up --build -d
 ```
 
-4. Переходите по ссылкам
-   - http://localhost/api/users/docs,
-   - http://localhost/api/docs
+4. Переходите по ссылке http://localhost/api/docs
