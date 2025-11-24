@@ -1,0 +1,149 @@
+services:
+  # --- NGINX ---
+  gateway:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      users_service:
+        condition: service_healthy
+      blog_service:
+        condition: service_healthy
+
+  # --- USERS ---
+  users_service:
+    container_name: users_service
+    build: ./users_service
+    env_file: .env
+    environment:
+      API__HOST: ${USERS_API__HOST}
+      API__PORT: ${USERS_API__PORT}
+      DB__HOST: ${USERS_DB__HOST}
+      DB__PORT: ${USERS_DB__PORT}
+      DB__NAME: ${USERS_DB__NAME}
+      DB__USER: ${USERS_DB__USER}
+      DB__PASSWORD: ${USERS_DB__PASSWORD}
+      JWT__SECRET_KEY: ${JWT__SECRET_KEY}
+    depends_on:
+      users_db:
+        condition: service_healthy
+    volumes:
+      - ./users_service/app:/app/app
+      - ./users_service/alembic.ini:/app/alembic.ini
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail --silent --show-error http://localhost:8000/api/users/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  users_db:
+    container_name: users_db
+    image: postgres:17-alpine
+    restart: always
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${USERS_DB__USER}
+      POSTGRES_PASSWORD: ${USERS_DB__PASSWORD}
+      POSTGRES_DB: ${USERS_DB__NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - users_db_data2:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U $${USERS_DB__USER} -d $${USERS_DB__NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- BLOG ---
+  blog_service:
+    container_name: blog_service
+    build: ./blog_service
+    env_file: .env
+    environment:
+      API__HOST: ${BLOG_API__HOST}
+      API__PORT: ${BLOG_API__PORT}
+      DB__NAME: ${BLOG_DB__NAME}
+      DB__HOST: ${BLOG_DB__HOST}
+      DB__PORT: ${BLOG_DB__PORT}
+      DB__USER: ${BLOG_DB__USER}
+      DB__PASSWORD: ${BLOG_DB__PASSWORD}
+    depends_on:
+      blog_db:
+        condition: service_healthy
+    volumes:
+      - ./blog_service/app:/app/app
+      - ./blog_service/alembic.ini:/app/alembic.ini
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail --silent --show-error http://localhost:8080/api/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  blog_db:
+    container_name: blog_db
+    image: postgres:17-alpine
+    restart: always
+    ports:
+      - "5433:5432"
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${BLOG_DB__NAME}
+      POSTGRES_USER: ${BLOG_DB__USER}
+      POSTGRES_PASSWORD: ${BLOG_DB__PASSWORD}
+    volumes:
+      - blog_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U $${BLOG_DB__USER} -d $${BLOG_DB__NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+
+  # --- Migrations ---
+  users_migrations:
+    container_name: users_migrations
+    build: ./users_service
+    command: alembic upgrade head
+    env_file: .env
+    environment:
+      DB__HOST: ${USERS_DB__HOST}
+      DB__PORT: ${USERS_DB__PORT}
+      DB__NAME: ${USERS_DB__NAME}
+      DB__USER: ${USERS_DB__USER}
+      DB__PASSWORD: ${USERS_DB__PASSWORD}
+    depends_on:
+      users_db:
+        condition: service_healthy
+    restart: "no"
+
+  blog_migrations:
+    container_name: blog_migrations
+    build: ./blog_service
+    command: alembic upgrade head
+    env_file: .env
+    environment:
+      DB__HOST: ${BLOG_DB__HOST}
+      DB__PORT: ${BLOG_DB__PORT}
+      DB__NAME: ${BLOG_DB__NAME}
+      DB__USER: ${BLOG_DB__USER}
+      DB__PASSWORD: ${BLOG_DB__PASSWORD}
+    depends_on:
+      blog_db:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  blog_db_data:
+  users_db_data2:

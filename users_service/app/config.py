@@ -6,8 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class APISettings(BaseModel):
-    host: str
-    port: int
+    host: str = "0.0.0.0"
+    port: int = 8000
 
 
 class DBSettings(BaseModel):
@@ -30,13 +30,13 @@ class DBSettings(BaseModel):
 
 
 class JWTSettings(BaseModel):
-    secret_key: str
-    algorithm: str
+    secret_key: str = "secret_key"
+    algorithm: str = "HS256"
 
 
 class Settings(BaseSettings):
-    api: APISettings
-    jwt: JWTSettings
+    api: APISettings = APISettings()
+    jwt: JWTSettings = JWTSettings()
     db: DBSettings
 
     model_config = SettingsConfigDict(

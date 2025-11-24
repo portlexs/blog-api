@@ -5,8 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class APISettings(BaseModel):
-    host: str
-    port: int
+    host: str = "0.0.0.0"
+    port: int = 8080
 
 
 class DBSettings(BaseModel):
@@ -29,7 +29,7 @@ class DBSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    api: APISettings
+    api: APISettings = APISettings()
     db: DBSettings
 
     model_config = SettingsConfigDict(
