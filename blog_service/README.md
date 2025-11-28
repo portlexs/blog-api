@@ -21,7 +21,12 @@ git clone https://github.com/portlexs/microservice-architecture
 3. Запустите сборку Docker образа:
 
 ```bash
-docker compose -p blog_api up --build -d
+docker compose -p blog --profile default up --build
 ```
 
-4. Переходите по ссылке http://localhost/api/docs
+4. Переходите по ссылке http://localhost:8000/docs
+
+обновление миграций в users service
+alembic -c users_service/alembic.ini revision --autogenerate -m "create users and tokens table"
+
+docker compose -p blog_api --profile users up --build

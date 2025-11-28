@@ -1,81 +1,159 @@
 services:
-  # --- API Service---
-  app:
-    build: .
-    container_name: blog_api
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
+  # --- NGINX ---
+  gateway:
+    image: nginx:latest
     ports:
-      - "${API__PORT:-8000}:8000"
+      - "80:80"
     volumes:
-      - .:/app:cached
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      users_service:
+        condition: service_healthy
+      blog_service:
+        condition: service_healthy
+
+  # --- USERS ---
+  users_service:
+    container_name: users_service
+    build: ./users_service
+    env_file: .env
+    environment:
+      API__HOST: ${USERS_API__HOST}
+      API__PORT: ${USERS_API__PORT}
+      DB__HOST: ${USERS_DB__HOST}
+      DB__PORT: ${USERS_DB__PORT}
+      DB__NAME: ${USERS_DB__NAME}
+      DB__USER: ${USERS_DB__USER}
+      DB__PASSWORD: ${USERS_DB__PASSWORD}
+      JWT__SECRET_KEY: ${JWT__SECRET_KEY}
+    depends_on:
+      users_db:
+        condition: service_healthy
+    volumes:
+      - ./users_service/app:/app/app
+      - ./users_service/alembic.ini:/app/alembic.ini
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl --fail --silent --show-error http://${API__HOST}:${API__PORT}/api/health || exit 1",
+          "curl --fail --silent --show-error http://localhost:8000/api/users/health || exit 1",
         ]
       interval: 10s
       timeout: 5s
       retries: 5
-    profiles: ["default"]
 
-  # --- Migration Service ---
-  migrate:
-    build: .
-    container_name: blog_migrate
-    command: bash -c "sleep 5 && alembic upgrade head"
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: "no"
-    profiles: ["default"]
-
-  # --- Database Service ---
-  db:
-    image: postgres:17
-    container_name: blog_db
+  users_db:
+    container_name: users_db
+    image: postgres:17-alpine
     restart: always
-    env_file:
-      - .env
+    env_file: .env
     environment:
-      POSTGRES_DB: ${DB__NAME}
-      POSTGRES_USER: ${DB__USER}
-      POSTGRES_PASSWORD: ${DB__PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${DB__USER} -d $${DB__NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 2
-    profiles: ["default"]
-
-  # --- Test Database Service ---
-  test_db:
-    image: postgres:17
-    container_name: blog_test_db
-    restart: always
-    environment:
-      POSTGRES_DB: test_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    volumes:
-      - test_postgres_data:/var/lib/postgresql/data
+      POSTGRES_USER: ${USERS_DB__USER}
+      POSTGRES_PASSWORD: ${USERS_DB__PASSWORD}
+      POSTGRES_DB: ${USERS_DB__NAME}
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    volumes:
+      - users_db_data2:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d test_db"]
+      test:
+        ["CMD-SHELL", "pg_isready -U $${USERS_DB__USER} -d $${USERS_DB__NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
-    profiles: ["test"]
+
+  # --- BLOG ---
+  blog_service:
+    container_name: blog_service
+    build: ./blog_service
+    env_file: .env
+    environment:
+      API__HOST: ${BLOG_API__HOST}
+      API__PORT: ${BLOG_API__PORT}
+      DB__NAME: ${BLOG_DB__NAME}
+      DB__HOST: ${BLOG_DB__HOST}
+      DB__PORT: ${BLOG_DB__PORT}
+      DB__USER: ${BLOG_DB__USER}
+      DB__PASSWORD: ${BLOG_DB__PASSWORD}
+    depends_on:
+      blog_db:
+        condition: service_healthy
+    volumes:
+      - ./blog_service/app:/app/app
+      - ./blog_service/alembic.ini:/app/alembic.ini
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail --silent --show-error http://localhost:8080/api/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  blog_db:
+    container_name: blog_db
+    image: postgres:17-alpine
+    restart: always
+    ports:
+      - "5433:5432"
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${BLOG_DB__NAME}
+      POSTGRES_USER: ${BLOG_DB__USER}
+      POSTGRES_PASSWORD: ${BLOG_DB__PASSWORD}
+    volumes:
+      - blog_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U $${BLOG_DB__USER} -d $${BLOG_DB__NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+
+  # --- Migrations ---
+  users_migrations:
+    container_name: users_migrations
+    build: ./users_service
+    command: alembic upgrade head
+    env_file: .env
+    environment:
+      DB__HOST: ${USERS_DB__HOST}
+      DB__PORT: ${USERS_DB__PORT}
+      DB__NAME: ${USERS_DB__NAME}
+      DB__USER: ${USERS_DB__USER}
+      DB__PASSWORD: ${USERS_DB__PASSWORD}
+    depends_on:
+      users_db:
+        condition: service_healthy
+    restart: "no"
+
+  blog_migrations:
+    container_name: blog_migrations
+    build: ./blog_service
+    command: alembic upgrade head
+    env_file: .env
+    environment:
+      DB__HOST: ${BLOG_DB__HOST}
+      DB__PORT: ${BLOG_DB__PORT}
+      DB__NAME: ${BLOG_DB__NAME}
+      DB__USER: ${BLOG_DB__USER}
+      DB__PASSWORD: ${BLOG_DB__PASSWORD}
+    depends_on:
+      blog_db:
+        condition: service_healthy
+    restart: "no"
+
+  # --- SWAGGER UI ---
+  swagger_ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger_ui
+    ports:
+      - "8081:8080"
+    environment:
+      URLS: "[ { url: '/api/users/openapi.json', name: 'Users Service' }, { url: '/api/openapi.json', name: 'Blog Service' } ]"
+      VALIDATOR_URL: none
 
 volumes:
-  postgres_data:
-  test_postgres_data:
+  blog_db_data:
+  users_db_data2:
