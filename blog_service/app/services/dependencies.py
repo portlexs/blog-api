@@ -1,13 +1,14 @@
 from typing import Annotated
 
-import httpx
 from fastapi import Depends, HTTPException, status
 
 from .article_service import ArticleService
+from ..config import settings
 from ..core.security import SecurityDep
 from .comment_service import CommentService
 from ..repositories.dependencies import ArticleRepositoryDep, CommentRepositoryDep
 from ..schemas.user_schemas import UserCurrent
+from ..services.jwt_service import JWTService
 
 
 async def get_article_service(
@@ -28,26 +29,23 @@ def get_comment_service(
 CommentServiceDep = Annotated[CommentService, Depends(get_comment_service)]
 
 
-async def get_current_user(credentials: SecurityDep) -> UserCurrent:
-    url = "http://users_service:8000/api/users/me"
-    headers = {"Authorization": f"Bearer {credentials.credentials}"}
+def get_jwt_service() -> JWTService:
+    return JWTService(
+        secret_key=settings.jwt.secret_key, algorithm=settings.jwt.algorithm
+    )
 
-    async with httpx.AsyncClient() as client:
-        try:
-            user_response = await client.get(url, headers=headers)
-        except httpx.RequestError:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Users service is unavailable",
-            )
 
-    if user_response.status_code != 200:
+JWTServiceDep = Annotated[JWTService, Depends(get_jwt_service)]
+
+
+async def get_current_user(
+    jwt_service: JWTServiceDep, credentials: SecurityDep
+) -> UserCurrent:
+    if credentials is None:
         raise HTTPException(
-            status_code=user_response.status_code,
-            detail=f"User service error: {user_response.json()['detail']}",
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
-    user_data = user_response.json()
-    return UserCurrent(**user_data)
+    return jwt_service.decode_token(credentials.credentials)
 
 
 CurrentUserDep = Annotated[UserCurrent, Depends(get_current_user)]

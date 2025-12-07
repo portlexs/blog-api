@@ -28,8 +28,14 @@ class DBSettings(BaseModel):
         )
 
 
+class JWTSettings(BaseModel):
+    secret_key: str = "secret_key"
+    algorithm: str = "HS256"
+
+
 class Settings(BaseSettings):
     api: APISettings = APISettings()
+    jwt: JWTSettings = JWTSettings()
     db: DBSettings
 
     model_config = SettingsConfigDict(
