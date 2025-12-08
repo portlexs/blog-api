@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.config import settings
 from app.database.base import Base
-from app.models import token_model, user_model
+from app.models import subscription_model, token_model, user_model
 
 config = context.config
 

@@ -1,6 +1,6 @@
 from urllib.parse import quote_plus
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -33,14 +33,20 @@ class JWTSettings(BaseModel):
     algorithm: str = "HS256"
 
 
+class CelerySettings(BaseModel):
+    broker_url: str = "redis://redis_broker:6379/0"
+
+
 class Settings(BaseSettings):
-    api: APISettings = APISettings()
+    api: APISettings = Field(validation_alias="BLOG_API")
     jwt: JWTSettings = JWTSettings()
-    db: DBSettings
+    db: DBSettings = Field(validation_alias="BLOG_DB")
+    celery: CelerySettings = CelerySettings()
 
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
+        extra="ignore",
     )
 
 

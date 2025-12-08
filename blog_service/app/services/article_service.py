@@ -3,10 +3,8 @@ from typing import List, Optional
 
 from slugify import slugify
 
-from ..exceptions.article_exceptions import (
-    ArticleAlreadyExistsError,
-    ArticleNotFoundError,
-)
+from ..core.celery_app import celery_app
+from ..exceptions.article_exceptions import ArticleNotFoundError
 from ..models.article_model import Article
 from ..repositories.article_repository import ArticleRepository
 from ..schemas.article_schemas import ArticleCreate, ArticleUpdate
@@ -39,6 +37,20 @@ class ArticleService:
             article.slug = f"{article.slug}-{uuid.uuid4().hex[:8]}"
 
         new_article = await self.article_repository.create_article(article)
+
+        try:
+            celery_app.send_task(
+                "send_post_notification",
+                kwargs={
+                    "author_id": user_id,
+                    "article_id": str(new_article.id),
+                    "post_title": new_article.title,
+                },
+                queue="notifications",
+            )
+        except Exception as e:
+            print(e)
+
         return new_article
 
     async def update_article(

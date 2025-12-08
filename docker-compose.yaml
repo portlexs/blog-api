@@ -154,6 +154,47 @@ services:
       URLS: "[ { url: '/api/users/openapi.json', name: 'Users Service' }, { url: '/api/openapi.json', name: 'Blog Service' } ]"
       VALIDATOR_URL: none
 
+  # --- REDIS ---
+  redis_broker:
+    container_name: redis_broker
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # --- PUSH NOTIFICATIONS ---
+  push_notifications:
+    image: ghcr.io/ayusavin/push-notification-playground:1.0.0
+    ports:
+      - "8082:8000"
+
+  # --- NOTIFICATION WORKER ---
+  notification_worker:
+    container_name: notification_worker
+    build: ./notification_worker
+    env_file: .env
+    command: celery -A app.main worker --loglevel=info --concurrency=2
+    environment:
+      CELERY__BROKER_URL: redis://redis_broker:6379/0
+      DB__HOST: ${USERS_DB__HOST}
+      DB__PORT: ${USERS_DB__PORT}
+      DB__NAME: ${USERS_DB__NAME}
+      DB__USER: ${USERS_DB__USER}
+      DB__PASSWORD: ${USERS_DB__PASSWORD}
+      PUSH_SERVICE_URL: http://push_notificator:8000/api/v1/notify
+    depends_on:
+      redis_broker:
+        condition: service_healthy
+      users_db:
+        condition: service_healthy
+      push_notifications:
+        condition: service_started
+
 volumes:
   blog_db_data:
   users_db_data2:

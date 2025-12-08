@@ -1,7 +1,6 @@
-from pathlib import Path
 from urllib.parse import quote_plus
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -35,14 +34,15 @@ class JWTSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-    api: APISettings = APISettings()
+    api: APISettings = Field(validation_alias="USERS_API")
     jwt: JWTSettings = JWTSettings()
-    db: DBSettings
+    db: DBSettings = Field(validation_alias="USERS_DB")
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
+        extra="ignore",
     )
 
 
