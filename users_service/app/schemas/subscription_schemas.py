@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class SubscriptionCreate(BaseModel):
-    subsсription_key: str
+    subscription_key: str
 
 
 class SubscriptionUpdate(BaseModel):

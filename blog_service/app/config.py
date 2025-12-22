@@ -34,7 +34,7 @@ class JWTSettings(BaseModel):
 
 
 class CelerySettings(BaseModel):
-    broker_url: str = "redis://redis_broker:6379/0"
+    broker_url: str = "redis://redis_broker:6380/0"
 
 
 class Settings(BaseSettings):

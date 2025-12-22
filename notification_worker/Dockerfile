@@ -26,9 +26,9 @@ RUN poetry config virtualenvs.create false \
 # Копирование исходного кода приложения
 COPY ./app /app/app
 
-# Пользователь не root (хорошая практика, но для лабы необязательно)
-# USER nobody
+# Пользователь не root
+USER nobody
 
 # Команда запуска по умолчанию
 # Запускаем Celery воркер, указывая путь к приложению (app.main)
-CMD ["celery", "-A", "app.main", "worker", "--loglevel=info"]
+CMD ["celery", "-A", "app.main", "worker", "--loglevel=info", "--concurrency=2", "-Q", "notifications"]

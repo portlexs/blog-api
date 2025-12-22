@@ -16,8 +16,8 @@ class DBSettings(BaseSettings):
 
 class Settings(BaseSettings):
     db: DBSettings = Field(validation_alias="USERS_DB")
-    celery_broker_url: str = "redis://redis_broker:6379/0"
-    push_service_url: str = "http://push_notificator:8000/api/v1/notify"
+    celery_broker_url: str = "redis://redis_broker:6380/0"
+    push_service_url: str = "http://push_notifications:8000/api/v1/notify"
 
     model_config = SettingsConfigDict(
         env_file=".env",

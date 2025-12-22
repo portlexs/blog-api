@@ -17,8 +17,8 @@ celery_app = Celery("notification_worker", broker=settings.celery_broker_url)
 celery_app.conf.task_routes = {"send_post_notification": "notifications"}
 
 
-async def _process_notification(author_id: str, post_id: str, post_title: str):
-    logger.info(f"Processing notification for post {post_id} by author {author_id}")
+async def _process_notification(author_id: str, article_id: str, post_title: str):
+    logger.info(f"Processing notification for post {article_id} by author {author_id}")
 
     async with AsyncSessionLocal() as session:
         try:
@@ -64,11 +64,11 @@ async def _process_notification(author_id: str, post_id: str, post_title: str):
 
 
 @celery_app.task(name="send_post_notification", bind=True, max_retries=3)
-def send_post_notification(self, author_id: str, post_id: str, post_title: str):
-    logger.info(f"Processing notification for post {post_id} by author {author_id}")
+def send_post_notification(self, author_id: str, article_id: str, post_title: str):
+    logger.info(f"Processing notification for post {article_id} by author {author_id}")
 
     try:
-        asyncio.run(_process_notification(author_id, post_id, post_title))
+        asyncio.run(_process_notification(author_id, article_id, post_title))
     except Exception as e:
         logger.error(f"Task failed: {e}")
         self.retry(exc=e, countdown=10 * (self.request.retries + 1))
