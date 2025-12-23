@@ -8,9 +8,11 @@ from ..core.security import SecurityDep
 from .jwt_service import JWTService
 from ..models.user_model import User
 from ..repositories.dependencies import (
+    SubscriptionRepositoryDep,
     TokenRepositoryDep,
     UserRepositoryDep,
 )
+from .subscription_service import SubscriptionService
 from .user_service import UserService
 
 
@@ -44,3 +46,12 @@ async def get_current_user(
 
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
+
+
+def get_subscriptions_service(
+    user_repository: UserRepositoryDep, subscribtion_repository: SubscriptionRepositoryDep
+) -> SubscriptionService:
+    return SubscriptionService(user_repository, subscribtion_repository)
+
+
+SubscriptionServiceDep = Annotated[SubscriptionService, Depends(get_subscriptions_service)]
